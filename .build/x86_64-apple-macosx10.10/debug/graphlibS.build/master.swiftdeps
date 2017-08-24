@@ -1,0 +1,9 @@
+version: "Apple Swift version 4.0 (swiftlang-900.0.63.10 clang-900.0.36)"
+options: "63c358cb3431e634cf873bf1ef0d755a"
+build_time: [1503567736, 290671000]
+inputs:
+  "/Users/mkatzmann/Documents/Development/Github/graphlibS/Sources/graphlibS/Helper/SLogging.swift": [1503567437, 0]
+  "/Users/mkatzmann/Documents/Development/Github/graphlibS/Sources/graphlibS/Helper/SStreamReader.swift": [1503566101, 0]
+  "/Users/mkatzmann/Documents/Development/Github/graphlibS/Sources/graphlibS/SAlgorithms.swift": [1503567308, 0]
+  "/Users/mkatzmann/Documents/Development/Github/graphlibS/Sources/graphlibS/SGraph.swift": [1503567408, 0]
+  "/Users/mkatzmann/Documents/Development/Github/graphlibS/Sources/graphlibS/graphlibS.swift": [1503567412, 0]
