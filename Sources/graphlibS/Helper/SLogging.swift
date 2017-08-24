@@ -8,20 +8,20 @@
 
 import Foundation
 
-class SLogging {
+public class SLogging {
     
     /**
      *  Logging messages
      */
-    static func error(message: String) {
+    public static func error(message: String) {
         print("[ERROR]: " + message)
     }
     
-    static func info(message: String) {
+    public static func info(message: String) {
         print("[Info]: " + message)
     }
     
-    static func debug(message: String) {
+    public static func debug(message: String) {
         print("[DEBUG]: " + message)
     }
     
@@ -34,14 +34,14 @@ class SLogging {
     ///
     /// - Parameter task: The task whos time should be measured.
     /// - Returns: The duration of the time the task took to finish.
-    static func measureTimeForTask(task: () -> Void) -> Double {
+    public static func measureTimeForTask(task: () -> Void) -> Double {
         let startTime = DispatchTime.now()
         task()
         let endTime = DispatchTime.now()
         return Double(endTime.uptimeNanoseconds - startTime.uptimeNanoseconds) / 1_000_000_000
     }
     
-    static func plotValues(x: [Double],
+    public static func plotValues(x: [Double],
                            y: [Double],
                            toDirectory directoryPath: String,
                            withFileName fileName: String) {

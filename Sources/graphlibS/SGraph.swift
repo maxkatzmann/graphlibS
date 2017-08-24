@@ -8,18 +8,18 @@
 
 import Foundation
 
-class SGraph {
-    var edges: [[Int]] = []
-    var vertexLabels: [Int: String] = [:]
-    var numberOfVertices: Int {
+public class SGraph {
+    public var edges: [[Int]] = []
+    public private(set) var vertexLabels: [Int: String] = [:]
+    public var numberOfVertices: Int {
         get {
             return edges.count
         }
     }
     
-    let directed: Bool
+    public let directed: Bool
     
-    init(filePath: String, directed: Bool = false) {
+    public init(filePath: String, directed: Bool = false) {
         self.directed = directed
         
         if let inputStreamReader = StreamReader(path: filePath) {
@@ -106,7 +106,7 @@ class SGraph {
         }
     }
     
-    func adjacent(u: Int, v: Int) -> Bool {
+    public func adjacent(u: Int, v: Int) -> Bool {
         guard u != v else {
             return false
         }

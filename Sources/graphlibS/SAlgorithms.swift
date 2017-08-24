@@ -8,7 +8,7 @@
 
 import Foundation
 
-class SAlgorithms {
+public class SAlgorithms {
     
     
     /// Determines the local clustering coefficients for all vertices in the graph
@@ -17,7 +17,7 @@ class SAlgorithms {
     ///
     /// - Parameter graph: The graph whose local clustering coefficiens are to be determined
     /// - Returns: An array of Double values representing the local clustering coefficients of the vertices in the graph.
-    static func localClusteringCoefficientDistribution(of graph: SGraph) -> [Double] {
+    public static func localClusteringCoefficientDistribution(of graph: SGraph) -> [Double] {
         var localClusteringCoefficients = [Double](repeating: 0.0,
                                                    count: graph.numberOfVertices)
         
