@@ -71,8 +71,8 @@ public class SLogging {
          *  Putting together the gnuplot command used to generate the plot.
          */
         var gnuplotCommand = "set term png\n" +
-            "set xrange [\(xmin):\(xmax)]" +
-            "set yrange [\(ymin):\(ymax)]" +
+            "set xrange [\(xmin):\(xmax)]\n" +
+            "set yrange [\(ymin):\(ymax)]\n" +
             "set output \"\(fileName)\"\n" +
             "plot '-' using 1:2 with lines\n"
         for i in 0..<x.count {
