@@ -9,7 +9,6 @@ class graphlibSTests: XCTestCase {
         XCTAssertEqual(graphlibS().text, "Hello, World!")
     }
 
-
     static var allTests = [
         ("testExample", testExample),
     ]

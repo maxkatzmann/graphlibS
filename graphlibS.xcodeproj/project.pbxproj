@@ -105,7 +105,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -113,7 +113,6 @@
 				OBJ_15 /* Tests */,
 				OBJ_18 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
@@ -127,10 +126,10 @@
 		OBJ_8 /* graphlibS */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_9 /* Helper */,
-				OBJ_12 /* SAlgorithms.swift */,
-				OBJ_13 /* SGraph.swift */,
 				OBJ_14 /* graphlibS.swift */,
+				OBJ_13 /* SGraph.swift */,
+				OBJ_12 /* SAlgorithms.swift */,
+				OBJ_9 /* Helper */,
 			);
 			name = graphlibS;
 			path = Sources/graphlibS;
@@ -210,7 +209,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_18 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

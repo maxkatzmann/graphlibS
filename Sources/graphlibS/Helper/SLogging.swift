@@ -43,6 +43,10 @@ public class SLogging {
     
     public static func plotValues(x: [Double],
                            y: [Double],
+                           xmin: Double = 0.0,
+                           xmax: Double = 1.0,
+                           ymin: Double = 0.0,
+                           ymax: Double = 1.0,
                            toDirectory directoryPath: String,
                            withFileName fileName: String) {
         guard x.count == y.count else {
@@ -53,10 +57,12 @@ public class SLogging {
          *  Putting together the gnuplot command used to generate the plot.
          */
         var gnuplotCommand = "set term png\n" +
+            "set xrange [\(xmin):\(xmax)]" +
+            "set yrange [\(ymin):\(ymax)]" +
             "set output \"\(fileName)\"\n" +
             "plot '-' using 1:2 with lines\n"
         for i in 0..<x.count {
-            gnuplotCommand += "\(y[i]) \(x[i])\n"
+            gnuplotCommand += "\(x[i]) \(y[i])\n"
         }
         gnuplotCommand += "e\n" +
             "q\n"
