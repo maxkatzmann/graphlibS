@@ -132,6 +132,7 @@ public class SGraph {
     ///
     /// - Complexity: O(1)
     /// - Returns: The index of the newly added vertex
+    @discardableResult
     public func addVertex() -> Int {
         self.edges.append([Int]())
         return self.edges.count - 1
@@ -193,6 +194,7 @@ public class SGraph {
     ///   - v: The index of the edge's source.
     ///   - u: The index of the edge's target.
     /// - Returns: A Bool indicating whether the addition was successful. The operation may fail if the edge is already present.
+    @discardableResult
     public func addEdge(from v: Int, to u: Int) -> Bool {
         guard !self.adjacent(u: u, v: v) else {
             return false
@@ -218,6 +220,7 @@ public class SGraph {
     ///   - u: The source vertex of the edge to be deleted.
     ///   - v: The target vertex of the edge to be deleted.
     /// - Returns: A Boolean value indicating whether the removal was successful. The operation may fail if the edge doesn't exist in the first place.
+    @discardableResult
     public func removeEdge(from u: Int, to v: Int) -> Bool {
         guard self.adjacent(u: u, v: v) else {
             return false
