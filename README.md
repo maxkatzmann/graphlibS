@@ -1,4 +1,5 @@
 # graphlibS
+[![GitHub tag](https://img.shields.io/github/tag/expressjs/express.svg?style=flat-square)]()
 
 This will (hopefully) become a high performance graph library written in Swift.
 Totally work in progress at the moment. I don't follow a certain schedule
