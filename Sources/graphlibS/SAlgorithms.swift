@@ -15,6 +15,7 @@ public class SAlgorithms {
     /// and returns them in an array. The local clustering coefficient of vertex
     /// i is stored at position i in the array.
     ///
+    /// - Complexity: O(numberOfNodes * max_degree^3)
     /// - Parameter graph: The graph whose local clustering coefficiens are to be determined
     /// - Returns: An array of Double values representing the local clustering coefficients of the vertices in the graph.
     public static func localClusteringCoefficientDistribution(of graph: SGraph) -> [Double] {
@@ -42,6 +43,13 @@ public class SAlgorithms {
                  *  in different ways.
                  */
                 var actualEdgesAmongNeighbors = 0
+                
+                /**
+                 *  In the following we count all the edges that are actually in
+                 *  the neighborhood of the vertex. This takes deg(v)^2 to iterate
+                 *  all possible neighbor pairs. Additionally a factor of max(deg(N(v)))
+                 *  is added by the adjacency check, leading to O(max_degree^3)
+                 */
                 
                 /**
                  *  If the graph is directed, we count all possible edges, which

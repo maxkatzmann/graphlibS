@@ -35,8 +35,7 @@ if CommandLine.arguments.count > 1 {
         let commitMessage = CommandLine.arguments[1]
         print("Commiting with message: \(commitMessage)")
 
-        let gitAddResult = shell(arguments: ["git", "add", "."])
-        // print("Added: \(gitAddResult)")
+        let _ = shell(arguments: ["git", "add", "."])
 
         let gitCommitResult = shell(arguments: ["git", "commit", "-m", "\(commitMessage)"])
         print("Commited: \(gitCommitResult)")
@@ -44,8 +43,7 @@ if CommandLine.arguments.count > 1 {
         let gitTagResult = shell(arguments: ["git", "tag", "\(newVersionString)"])
         print("Tagged: \(gitTagResult)")
 
-        let gitPushResult = shell(arguments: ["git", "push", "origin", "master", "--tags"])
-        // print("Pushed: \(gitPushResult)")
+        let _ = shell(arguments: ["git", "push", "origin", "master", "--tags"])
 
         print("Pushed.")
     }
