@@ -1,5 +1,5 @@
 # graphlibS
-[![GitHub tag](https://img.shields.io/github/tag/expressjs/express.svg)](https://github.com/maxkatzmann/graphlibS/)
+[![GitHub tag](https://img.shields.io/badge/Version-0.0.9-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.9)
 
 This will (hopefully) become a high performance graph library written in Swift.
 Totally work in progress at the moment. I don't follow a certain schedule
@@ -14,3 +14,5 @@ What's currently working:
 * Creating and editing a graph programmatically
 * Printing the adjacency list of a graph
 * Determining the local clustering coefficients of the vertices in the graph
+
+

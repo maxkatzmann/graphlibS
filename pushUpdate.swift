@@ -32,6 +32,25 @@ if CommandLine.arguments.count > 1 {
         let newVersionString = versionComponents.joined(separator: ".")
         print("New version will be: \(newVersionString)")
 
+        /**
+         * Now we update the readme to contain a badge showing the correct version.
+         */
+        let path = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("README.md")
+        let readmeContent = try String(contentsOf: path)
+        var newReadme = ""
+        let lines = readmeContent.components(separatedBy: "\n")
+        for line in lines {
+            if line.range(of: "[GitHub tag]") != nil {
+                let newTagLine = "[![GitHub tag](https://img.shields.io/badge/Version-\(newVersionString)-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/\(newVersionString))"
+                newReadme.append(newTagLine + "\n")
+            } else {
+                newReadme.append(line + "\n")
+            }
+        }
+
+        try newReadme.write(to: path, atomically: false,
+                                encoding: .utf8)
+
         let commitMessage = CommandLine.arguments[1]
         print("Commiting with message: \(commitMessage)")
 
