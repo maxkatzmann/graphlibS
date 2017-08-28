@@ -1,5 +1,5 @@
 # graphlibS
-[![GitHub tag](https://img.shields.io/github/tag/expressjs/express.svg?style=flat-square)]()
+[![Semver](http://img.shields.io/SemVer/2.0.0.png)](http://semver.org/spec/v2.0.0.html)
 
 This will (hopefully) become a high performance graph library written in Swift.
 Totally work in progress at the moment. I don't follow a certain schedule
