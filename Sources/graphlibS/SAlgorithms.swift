@@ -10,6 +10,71 @@ import Foundation
 
 public class SAlgorithms {
     
+    //MARK: - Search
+    
+    /// Performs a Breadth First Search in the graph starting at a given vertex
+    /// and executes a task for each vertex found.
+    ///
+    /// - Complexity: O((numberOfNodes + numberOfEdges) * Complexity of 'task')
+    /// - Parameters:
+    ///   - graph: The graph in which the BFS is to be perfomed.
+    ///   - vertex: The vertex where the BFS should start.
+    ///   - task: A closure that gets called for each (vertex, parent) that is found during the BFS. The closure returns a boolean value indicating whether this node should be further explored or not.
+    public static func breadthFirstSearch(in graph: SGraph, startingAt v: Int, performingTaskOnSeenVertex task: (Int, Int) -> (Bool)) {
+        
+        /**
+         *  The priority queue will hold all vertices that we have encountered
+         *  but not explored, yet.
+         */
+        var priorityQueue = [v]
+        
+        /**
+         *  To make sure we don't explore a vertex twice, we keep track of the
+         *  vertices that we have already seen.
+         */
+        var seenVertices: Set = [v]
+        
+        while !priorityQueue.isEmpty {
+            
+            /**
+             *  Get the vertex to explore next.
+             */
+            let u = priorityQueue.removeFirst()
+            
+            /**
+             *  We will only explore neighbors of the current vertex if
+             *  we have not seen them yet.
+             */
+            var neighborsToExplore = Set(graph.edges[u])
+            neighborsToExplore.subtract(seenVertices)
+            
+            for neighbor in neighborsToExplore {
+                
+                /**
+                 *  We have just seen a new vertex.
+                 */
+                seenVertices.insert(neighbor)
+                
+                /**
+                 *  We're about to add to the priority queue in order to be
+                 *  explored later. Beforehand we pass it to the task (along
+                 *  with its parent 'u' in the BFS tree) which processes the vertex
+                 *  and returns 'true' if the vertex should be explored. If the
+                 *  task returns 'false' we do not explore the vertex.
+                 */
+                if task(neighbor, u) {
+                    
+                    /**
+                     *  We can now add the newly seen neighbor to the priority
+                     *  queue such that it can be explored later.
+                     */
+                    priorityQueue.append(neighbor)
+                }
+            }
+        }
+    }
+    
+    //MARK: - Clustering
     
     /// Determines the local clustering coefficients for all vertices in the graph
     /// and returns them in an array. The local clustering coefficient of vertex

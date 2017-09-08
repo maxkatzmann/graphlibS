@@ -23,12 +23,12 @@ public class SGraph {
     
     /// Default initializer.
     ///
-    /// - Complexity: O(numberOfNodes)
+    /// - Complexity: O(numberOfVertices)
     /// - Parameter directed: Bool indicating whether the graph is directed.
-    public init(numberOfNodes: Int = 0, directed: Bool = false) {
+    public init(numberOfVertices: Int = 0, directed: Bool = false) {
         self.directed = directed
         
-        for _ in 0..<numberOfNodes {
+        for _ in 0..<numberOfVertices {
             edges.append([Int]())
         }
     }
@@ -125,7 +125,7 @@ public class SGraph {
         }
     }
     
-    //MARK: - Nodes and Edges
+    //MARK: - Vertices and Edges
     
     
     /// Add a vertex to the graph.
@@ -257,6 +257,269 @@ public class SGraph {
                 return self.edges[v].contains(u)
             }
         }
+    }
+    
+    
+    /// The degree of v in the receiver. That is the number of outgoing edges of v.
+    ///
+    /// - Complexity: O(1)
+    /// - Parameter v: The degree of v.
+    public func degree(of v: Int) -> Int {
+        return self.edges[v].count
+    }
+    
+    //MARK: - Subgraph
+    
+    /// Obtain the subgraph of the receiver induced by the vertices in the passed set.
+    ///
+    /// - Complexity: O(|vertices| * max_degree)
+    /// - Parameter vertices: The vertex set that forms the induced subgraph.
+    /// - Returns: A tuple containing the induced subgraph and a dictionary that maps the vertices in the receiver to their counterparts in the induced subgraph.
+    public func subgraph(containing vertices: Set<Int>) -> (SGraph, [Int: Int]) {
+        
+        /**
+         *  Our subgraph will contain as many vertices as we get passed.
+         */
+        let subgraph = SGraph(numberOfVertices: vertices.count,
+                              directed: self.directed)
+        
+        /**
+         *  The vertices in the new graph are indexed from 0 to |vertices| - 1.
+         *  Therefore, we create a map that can later be used to identify the
+         *  vertices in the subgraph.
+         */
+        let indexedVertices = Array(vertices)
+        var vertexMap = [Int: Int]()
+        for (index, vertex) in indexedVertices.enumerated() {
+            vertexMap[vertex] = index
+        }
+        
+        /**
+         *  Now we have to build the subgraph by adding the edges from the
+         *  original subgraph, where both end points are also in the passed
+         *  vertex set.
+         */
+        for (v_orig, v) in vertexMap {
+            /**
+             *  Take the neighbors of v_orig in the orignal graph and and reduce
+             *  this set to only contain the vertices in the subgraph.
+             */
+            let reducedNeighborsOfOriginalGraph = Set(self.edges[v_orig]).intersection(vertices)
+            
+            /**
+             *  Now we map the remaining orignal neighbors to their
+             *  indices in the subgraph.
+             */
+            var neighborsInSubgraph = [Int]()
+            for neighborInOriginalGraph in reducedNeighborsOfOriginalGraph {
+                
+                /**
+                 *  If the force unwrapping fails here, the vertex map is corrupted
+                 *  which cannot happen.
+                 */
+                neighborsInSubgraph.append(vertexMap[neighborInOriginalGraph]!)
+            }
+            
+            /**
+             *  Finally, we assign the neighbors of the vertex in the subgraph.
+             */
+            subgraph.edges[v] = neighborsInSubgraph
+        }
+        
+        return (subgraph, vertexMap)
+    }
+    
+    //MARK: - Connected Components
+    
+    /// Determines the vertex set representing the connected component that
+    /// contains the passed vertex v.
+    ///
+    /// - Complexity: O(numberOfVertices + numberOfEdges)
+    /// - Parameter v: The vertex contained in the component to obtain.
+    /// - Returns: A vertex set representing the connected component that contains v.
+    public func verticesInConnectedComponent(containing v: Int) -> Set<Int> {
+        /**
+         *  We collect the vertices that belong to this component.
+         *  The start vertex belongs to it in any case.
+         */
+        var verticesInComponent: Set<Int> = [v]
+        
+        SAlgorithms.breadthFirstSearch(in: self,
+                                       startingAt: v,
+                                       performingTaskOnSeenVertex: {
+                                        
+                                        (u: Int, _: Int) -> (Bool) in
+                                        
+                                        /**
+                                         *  Every vertex we encounter in this BFS
+                                         *  belongs to our component.
+                                         */
+                                        verticesInComponent.insert(u)
+                                        
+                                        /**
+                                         *  We always want to continue exploring
+                                         */
+                                        return true
+        })
+        
+        return verticesInComponent
+    }
+    
+    
+    /// Determines the vertex set representing the connected component that contains v.
+    ///
+    /// - Complexity: Complexity of 'verticesInConnectedComponent:' + Complexity of 'subgraph:'
+    /// - Parameter v: The vertex whose connected component is to be optained.
+    /// - Returns: A tuple containing an SGraph representing the connected component containing v and a dictionary that maps the vertices in the receiver to the vertices in the induced subgraph.
+    public func connectedComponent(containing v: Int) -> (SGraph, [Int: Int]) {
+        return self.subgraph(containing: self.verticesInConnectedComponent(containing: v))
+    }
+    
+    /// Determines the vertex set representing the largest connected component
+    /// in the graph.
+    /// - Note: This method is asymptotically not faster than 'verticesInConnectedComponents', it might be faster in practive if one is only interested in the largest component.
+    ///
+    /// - Complexity: Complexity of 'verticesInConnectedComponents'
+    /// - Returns: A vertex set containing the vertices of the largest connected component of the receiver.
+    public func verticesInLargestConnectedComponent() -> Set<Int> {
+        var largestConnectedComponent = Set<Int>()
+        
+        /**
+         *  In order to obtain the connected components of a graph we perform
+         *  multiple breadth first searches each starting at a vertex that was
+         *  not yet visited by a previous breadth first search.
+         *
+         *  This is repeated until there cannot be any larger connected
+         *  component than the largest one we currently have.
+         */
+        var unseenVertices = Set(0..<self.numberOfVertices)
+        
+        while let v = unseenVertices.first {
+            
+            /**
+             *  Get the vertices of the component that contains the start vertex v.
+             */
+            let verticesInCurrentComponent = self.verticesInConnectedComponent(containing: v)
+            
+            /**
+             *  These vertices are no longer unseen.
+             */
+            unseenVertices.subtract(verticesInCurrentComponent)
+            
+            /**
+             *  If we found a component that is larger than the largest one that
+             *  we found previously, the new one is the new largest component.
+             */
+            if verticesInCurrentComponent.count > largestConnectedComponent.count {
+                largestConnectedComponent = verticesInCurrentComponent
+            }
+            
+            /**
+             *  If the largest connected component thus far is larger than the
+             *  the number of unseen vertices, we cannot find a larger component
+             *  among them. Therefore, we can return early.
+             *
+             *  Note that we will always return here eventually, since after
+             *  iterating all components the number of unseen vertices is 0 and
+             *  our largest component will be larger anyway.
+             */
+            if largestConnectedComponent.count > unseenVertices.count {
+                return largestConnectedComponent
+            }
+        }
+        
+        /**
+         *  This statement will usually not be executed since we return earlier
+         *  on anyways. An exception might occur for edge cases, for example the
+         *  graph being empty.
+         */
+        return largestConnectedComponent
+    }
+    
+    /// Determines the subgraph of the receiver that represents the largest connected
+    /// component.
+    ///
+    /// - Returns: A tuple containing an SGraph representing the largest component of the receiver, and a dictionary that maps the vertices in the original graph to their counterpart in the induced subgraph.
+    public func largestConnectedComponent() -> (SGraph, [Int: Int]) {
+        return self.subgraph(containing: self.verticesInLargestConnectedComponent())
+    }
+    
+    /// Determines the vertex sets that represent the connected components of
+    /// the graph.
+    ///
+    /// - Complexity: O(numberOfVertices + numberOfEdges). Additionally for each component Set subtractions have to be performed.
+    /// - Returns: An array containing sets representing the connected components of the receiver, sorted by the size of the components in descending order.
+    public func verticesInConnectedComponents() -> [Set<Int>] {
+        
+        var verticesInComponents = [Set<Int>]()
+        
+        /**
+         *  In order to obtain the connected components of a graph we perform
+         *  multiple breadth first searches each starting at a vertex that was
+         *  not yet visited by a previous breadth first search.
+         */
+        var unseenVertices = Set(0..<self.numberOfVertices)
+        
+        /**
+         *  As long as there is at least one unseen vertex in the graph, we take
+         *  that vertex and perform a breadth first search starting at it.
+         *
+         *  All vertices we encounter during this BFS will form one component.
+         */
+        while let v = unseenVertices.first {
+            
+            /**
+             *  Get the vertices of the component that contains the start vertex v.
+             */
+            let verticesInCurrentComponent = self.verticesInConnectedComponent(containing: v)
+            
+            /**
+             *  These vertices are no longer unseen.
+             */
+            unseenVertices.subtract(verticesInCurrentComponent)
+            
+            /**
+             *  Now we simply add the vertices in the current component to
+             *  the array containing the vertex sets of the vertices.
+             */
+            verticesInComponents.append(verticesInCurrentComponent)
+        }
+        
+        verticesInComponents.sort {
+            (component1: Set<Int>, component2: Set<Int>) -> Bool in
+            return component1.count > component2.count
+        }
+        
+        return verticesInComponents
+    }
+    
+    /// Determines all connected components of the receiver.
+    ///
+    /// - Complexity: Complexits of 'verticesInConnectedComponents' + Complexity of 'subgraph'. (The latter is amortized in O(numberOfVertice * max_degree))
+    /// - Returns: An array of tuples, each containing a subgraph representing a connected component of the receiver as well as a dictionary that maps the vertices in the receiver to their counterparts in the induced subgraph. (sorted by component size).
+    public func connectedComponents() -> [(SGraph, [Int: Int])] {
+        
+        var components: [(SGraph, [Int: Int])] = []
+        
+        /**
+         *  At first we obtain all vertex sets that represent a connected component
+         *  of the graph.
+         */
+        let verticesInConnectedComponents = self.verticesInConnectedComponents()
+        
+        /**
+         *  Now we iterate the vertex sets representing the components and
+         *  form their induced subgraphs.
+         */
+        for componentVertexSet in verticesInConnectedComponents {
+            /**
+             *  Now we add the subgraph induced by the vertices in the current
+             *  component into our array of components.
+             */
+            components.append(self.subgraph(containing: componentVertexSet))
+        }
+        
+        return components
     }
     
     //MARK: - Writing
