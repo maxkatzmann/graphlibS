@@ -1,5 +1,5 @@
 # graphlibS
-[![GitHub tag](https://img.shields.io/badge/Version-0.0.11-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.11)
+[![GitHub tag](https://img.shields.io/badge/Version-0.0.12-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.12)
 
 This will (hopefully) become a high performance graph library written in Swift.
 Totally work in progress at the moment. I don't follow a certain schedule
@@ -15,14 +15,18 @@ deleting a vertex that is not actually in the graph will lead to a crash, etc.
 **Initialization**
 * Read a (directed or undirected) graph from a file
 * Create a graph programmatically
+
 **Manipulation**
 * add vertices / edges
 * delete vertices / edges
+
 **Adjacency**
 * check whether two vertices are connected
 * get the degree of a vertex
+
 **Subgraph**
 * get the induced subgraph of a graph containing specified vertices
+
 **Connected Components**
 * get the vertex set representing the connected component containing a vertex
 * get the vertex set representing the largest connected component of a graph
@@ -30,14 +34,26 @@ deleting a vertex that is not actually in the graph will lead to a crash, etc.
 * get a subgraph representing the connected component containing a vertex 
 * get a subgraph representing the largest connected component of a graph
 * get the subgraphs representing all connected components of a graph
+
 **Output**
-* Printing the adjacency list of a graph
+* print the adjacency list of a graph
 
 ---
 
 ## Current Algorithms
 * Breadth First Search starting at a specified vertex.
 * Determining the local clustering coefficients of the vertices in the graph
+
+---
+
+## Documentation
+The code itself should be well documented. I hope to add some usage examples
+here soon.
+
+---
+## License
+GPL-3.0
+
 
 
 
