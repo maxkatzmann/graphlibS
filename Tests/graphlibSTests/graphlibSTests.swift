@@ -8,7 +8,7 @@ class graphlibSTests: XCTestCase {
         /**
          *  Create a graph with 6 vertices and two components.
          */
-        let G = SGraph(numberOfNodes: 6, directed: false)
+        let G = SGraph(numberOfVertices: 6, directed: false)
         
         /**
          *  One component contains the vertices 0...3
@@ -47,7 +47,7 @@ class graphlibSTests: XCTestCase {
         /**
          *  Create a graph with 6 vertices and two components.
          */
-        let G = SGraph(numberOfNodes: 6, directed: false)
+        let G = SGraph(numberOfVertices: 6, directed: false)
         
         /**
          *  One component contains the vertices 0...3
@@ -126,7 +126,7 @@ class graphlibSTests: XCTestCase {
         /**
          *  Create a graph with 6 vertices and two components.
          */
-        let G = SGraph(numberOfNodes: 6, directed: false)
+        let G = SGraph(numberOfVertices: 6, directed: false)
         
         /**
          *  One component contains the vertices 0...3
@@ -144,7 +144,7 @@ class graphlibSTests: XCTestCase {
         /**
          *  We want our subgraph to contain the vertice 0, 1, 2 and 4
          */
-        let verticesInSubgraph: Set<Int> = [0, 1, 2, 4]
+        let verticesInSubgraph = [0, 1, 2, 4]
         
         let (subgraph, vertexMap) = G.subgraph(containing: verticesInSubgraph)
         
@@ -188,7 +188,7 @@ class graphlibSTests: XCTestCase {
         XCTAssert(subgraph.degree(of: vertexMap[4]!) == 0,
                   "The degree of vertex 4 was \(subgraph.degree(of: vertexMap[4]!)) instead of 0!")
     }
-
+    
     static var allTests = [
         ("testLargestConnectedComponent", testLargestConnectedComponent),
         ("testConnectedComponents", testConnectedComponents),

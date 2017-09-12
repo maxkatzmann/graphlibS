@@ -275,7 +275,7 @@ public class SGraph {
     /// - Complexity: O(|vertices| * max_degree)
     /// - Parameter vertices: The vertex set that forms the induced subgraph.
     /// - Returns: A tuple containing the induced subgraph and a dictionary that maps the vertices in the receiver to their counterparts in the induced subgraph.
-    public func subgraph(containing vertices: Set<Int>) -> (SGraph, [Int: Int]) {
+    public func subgraph(containing vertices: [Int]) -> (SGraph, [Int: Int]) {
         
         /**
          *  Our subgraph will contain as many vertices as we get passed.
@@ -288,9 +288,8 @@ public class SGraph {
          *  Therefore, we create a map that can later be used to identify the
          *  vertices in the subgraph.
          */
-        let indexedVertices = Array(vertices)
         var vertexMap = [Int: Int]()
-        for (index, vertex) in indexedVertices.enumerated() {
+        for (index, vertex) in vertices.enumerated() {
             vertexMap[vertex] = index
         }
         
@@ -301,23 +300,22 @@ public class SGraph {
          */
         for (v_orig, v) in vertexMap {
             /**
-             *  Take the neighbors of v_orig in the orignal graph and and reduce
-             *  this set to only contain the vertices in the subgraph.
-             */
-            let reducedNeighborsOfOriginalGraph = Set(self.edges[v_orig]).intersection(vertices)
-            
-            /**
              *  Now we map the remaining orignal neighbors to their
              *  indices in the subgraph.
              */
             var neighborsInSubgraph = [Int]()
-            for neighborInOriginalGraph in reducedNeighborsOfOriginalGraph {
+            for neighborInOriginalGraph in self.edges[v_orig] {
                 
                 /**
-                 *  If the force unwrapping fails here, the vertex map is corrupted
-                 *  which cannot happen.
+                 *  Check whether this neighbor is also in the subgraph
                  */
-                neighborsInSubgraph.append(vertexMap[neighborInOriginalGraph]!)
+                if vertices.contains(neighborInOriginalGraph) {
+                    /**
+                     *  If the force unwrapping fails here, the vertex map is corrupted
+                     *  which cannot happen.
+                     */
+                    neighborsInSubgraph.append(vertexMap[neighborInOriginalGraph]!)
+                }
             }
             
             /**
@@ -336,13 +334,14 @@ public class SGraph {
     ///
     /// - Complexity: O(numberOfVertices + numberOfEdges)
     /// - Parameter v: The vertex contained in the component to obtain.
-    /// - Returns: A vertex set representing the connected component that contains v.
-    public func verticesInConnectedComponent(containing v: Int) -> Set<Int> {
+    /// - Returns: An array containing the vertices of the connected component that contains v.
+    public func verticesInConnectedComponent(containing v: Int) -> [Int] {
+        
         /**
          *  We collect the vertices that belong to this component.
          *  The start vertex belongs to it in any case.
          */
-        var verticesInComponent: Set<Int> = [v]
+        var verticesInComponent = [v]
         
         SAlgorithms.breadthFirstSearch(in: self,
                                        startingAt: v,
@@ -354,7 +353,7 @@ public class SGraph {
                                          *  Every vertex we encounter in this BFS
                                          *  belongs to our component.
                                          */
-                                        verticesInComponent.insert(u)
+                                        verticesInComponent.append(u)
                                         
                                         /**
                                          *  We always want to continue exploring
@@ -380,51 +379,67 @@ public class SGraph {
     /// - Note: This method is asymptotically not faster than 'verticesInConnectedComponents', it might be faster in practive if one is only interested in the largest component.
     ///
     /// - Complexity: Complexity of 'verticesInConnectedComponents'
-    /// - Returns: A vertex set containing the vertices of the largest connected component of the receiver.
-    public func verticesInLargestConnectedComponent() -> Set<Int> {
-        var largestConnectedComponent = Set<Int>()
+    /// - Returns: An array containing the vertices of the largest connected component of the receiver.
+    public func verticesInLargestConnectedComponent() -> [Int] {
+        
+        var largestConnectedComponent = [Int]()
         
         /**
-         *  In order to obtain the connected components of a graph we perform
-         *  multiple breadth first searches each starting at a vertex that was
-         *  not yet visited by a previous breadth first search.
-         *
-         *  This is repeated until there cannot be any larger connected
-         *  component than the largest one we currently have.
+         *  Knowing how many vertices were not seen yet helps in determining
+         *  whether its useful to continue searching for larger components.
          */
-        var unseenVertices = Set(0..<self.numberOfVertices)
+        var numberOfUnseenVertices = self.numberOfVertices
         
-        while let v = unseenVertices.first {
+        /**
+         *  We store the seen/unseen/processed state of each vertex in this array.
+         */
+        var vertexStates = [SVertexState](repeating: .unseen,
+                                          count: self.numberOfVertices)
+        
+        /**
+         *  We iterate all the vertices of our graph.
+         */
+        for v in 0..<self.numberOfVertices {
             
             /**
-             *  Get the vertices of the component that contains the start vertex v.
+             *  Only if a vertex was not seen yet, we actually process it.
              */
-            let verticesInCurrentComponent = self.verticesInConnectedComponent(containing: v)
-            
-            /**
-             *  These vertices are no longer unseen.
-             */
-            unseenVertices.subtract(verticesInCurrentComponent)
-            
-            /**
-             *  If we found a component that is larger than the largest one that
-             *  we found previously, the new one is the new largest component.
-             */
-            if verticesInCurrentComponent.count > largestConnectedComponent.count {
-                largestConnectedComponent = verticesInCurrentComponent
-            }
-            
-            /**
-             *  If the largest connected component thus far is larger than the
-             *  the number of unseen vertices, we cannot find a larger component
-             *  among them. Therefore, we can return early.
-             *
-             *  Note that we will always return here eventually, since after
-             *  iterating all components the number of unseen vertices is 0 and
-             *  our largest component will be larger anyway.
-             */
-            if largestConnectedComponent.count > unseenVertices.count {
-                return largestConnectedComponent
+            if vertexStates[v] == .unseen {
+                /**
+                 *  Get the vertices of the component that contains the start vertex v.
+                 */
+                let verticesInCurrentComponent = self.verticesInConnectedComponent(containing: v)
+                
+                /**
+                 *  All the vertices that are in the current component cannot
+                 *  be in another larger component and are therefore marked as
+                 *  seen such that they are not processed again.
+                 */
+                for u in verticesInCurrentComponent {
+                    vertexStates[u] = .seen
+                    numberOfUnseenVertices -= 1
+                }
+                
+                /**
+                 *  If we found a component that is larger than the largest one that
+                 *  we found previously, the new one is the new largest component.
+                 */
+                if verticesInCurrentComponent.count > largestConnectedComponent.count {
+                    largestConnectedComponent = verticesInCurrentComponent
+                }
+                
+                /**
+                 *  If the largest connected component thus far is larger than the
+                 *  the number of unseen vertices, we cannot find a larger component
+                 *  among them. Therefore, we can return early.
+                 *
+                 *  Note that we will always return here eventually, since after
+                 *  iterating all components the number of unseen vertices is 0 and
+                 *  our largest component will be larger anyway.
+                 */
+                if largestConnectedComponent.count > numberOfUnseenVertices {
+                    return largestConnectedComponent
+                }
             }
         }
         
@@ -448,45 +463,59 @@ public class SGraph {
     /// the graph.
     ///
     /// - Complexity: O(numberOfVertices + numberOfEdges). Additionally for each component Set subtractions have to be performed.
-    /// - Returns: An array containing sets representing the connected components of the receiver, sorted by the size of the components in descending order.
-    public func verticesInConnectedComponents() -> [Set<Int>] {
+    /// - Returns: An array containing arrays, each representing the connected components of the receiver, sorted by the size of the components in descending order.
+    public func verticesInConnectedComponents() -> [[Int]] {
         
-        var verticesInComponents = [Set<Int>]()
+        var verticesInComponents = [[Int]]()
         
         /**
          *  In order to obtain the connected components of a graph we perform
          *  multiple breadth first searches each starting at a vertex that was
          *  not yet visited by a previous breadth first search.
+         *
+         *  Knowing how many vertices were not seen yet helps in determining
+         *  whether its useful to continue searching for larger components.
          */
-        var unseenVertices = Set(0..<self.numberOfVertices)
+        var numberOfUnseenVertices = self.numberOfVertices
         
         /**
-         *  As long as there is at least one unseen vertex in the graph, we take
-         *  that vertex and perform a breadth first search starting at it.
-         *
-         *  All vertices we encounter during this BFS will form one component.
+         *  We store the seen/unseen/processed state of each vertex in this array.
          */
-        while let v = unseenVertices.first {
+        var vertexStates = [SVertexState](repeating: .unseen,
+                                          count: self.numberOfVertices)
+        
+        /**
+         *  We iterate all the vertices of our graph.
+         */
+        for v in 0..<self.numberOfVertices {
             
             /**
-             *  Get the vertices of the component that contains the start vertex v.
+             *  Only if a vertex was not seen yet, we actually process it.
              */
-            let verticesInCurrentComponent = self.verticesInConnectedComponent(containing: v)
-            
-            /**
-             *  These vertices are no longer unseen.
-             */
-            unseenVertices.subtract(verticesInCurrentComponent)
-            
-            /**
-             *  Now we simply add the vertices in the current component to
-             *  the array containing the vertex sets of the vertices.
-             */
-            verticesInComponents.append(verticesInCurrentComponent)
+            if vertexStates[v] == .unseen {
+                /**
+                 *  Get the vertices of the component that contains the start vertex v.
+                 */
+                let verticesInCurrentComponent = self.verticesInConnectedComponent(containing: v)
+                
+                for u in verticesInCurrentComponent {
+                    vertexStates[u] = .seen
+                    numberOfUnseenVertices -= 1
+                }
+                
+                /**
+                 *  Now we simply add the vertices in the current component to
+                 *  the array containing the vertex sets of the vertices.
+                 */
+                verticesInComponents.append(verticesInCurrentComponent)
+            }
         }
         
+        /**
+         *  Finally, we sort the components by size.
+         */
         verticesInComponents.sort {
-            (component1: Set<Int>, component2: Set<Int>) -> Bool in
+            (component1: [Int], component2: [Int]) -> Bool in
             return component1.count > component2.count
         }
         

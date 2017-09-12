@@ -8,6 +8,12 @@
 
 import Foundation
 
+enum SVertexState: Int {
+    case unseen = -1
+    case seen = 0
+    case processed = 1
+}
+
 public class SAlgorithms {
     
     //MARK: - Search
@@ -26,51 +32,51 @@ public class SAlgorithms {
          *  The priority queue will hold all vertices that we have encountered
          *  but not explored, yet.
          */
+        var vertexStates = [SVertexState](repeating: .unseen,
+                                          count: graph.numberOfVertices)
+        
         var priorityQueue = [v]
         
-        /**
-         *  To make sure we don't explore a vertex twice, we keep track of the
-         *  vertices that we have already seen.
-         */
-        var seenVertices: Set = [v]
-        
         while !priorityQueue.isEmpty {
-            
             /**
              *  Get the vertex to explore next.
              */
             let u = priorityQueue.removeFirst()
             
             /**
-             *  We will only explore neighbors of the current vertex if
-             *  we have not seen them yet.
+             *  Explore neighbors of u.
              */
-            var neighborsToExplore = Set(graph.edges[u])
-            neighborsToExplore.subtract(seenVertices)
-            
-            for neighbor in neighborsToExplore {
+            for neighbor in graph.edges[u] {
                 
                 /**
-                 *  We have just seen a new vertex.
+                 *  Only process neighbors that have not been seen yet
                  */
-                seenVertices.insert(neighbor)
-                
-                /**
-                 *  We're about to add to the priority queue in order to be
-                 *  explored later. Beforehand we pass it to the task (along
-                 *  with its parent 'u' in the BFS tree) which processes the vertex
-                 *  and returns 'true' if the vertex should be explored. If the
-                 *  task returns 'false' we do not explore the vertex.
-                 */
-                if task(neighbor, u) {
+                if vertexStates[neighbor] == .unseen {
+                    vertexStates[neighbor] = .seen
                     
                     /**
-                     *  We can now add the newly seen neighbor to the priority
-                     *  queue such that it can be explored later.
+                     *  We're about to add the neighbor to the priority queue in
+                     *  order to be processed later. Beforehand we pass it to the
+                     *  task (along with its parent 'u' in the BFS tree) which
+                     *  processes the vertex and returns 'true' if the vertex should
+                     *  be processed. If the task returns 'false' we do not process
+                     *  the vertex.
                      */
-                    priorityQueue.append(neighbor)
+                    if task(neighbor, u) {
+                        
+                        /**
+                         *  We can now add the newly seen neighbor to the priority
+                         *  queue such that it can be explored later.
+                         */
+                        priorityQueue.append(neighbor)
+                    }
                 }
             }
+            
+            /**
+             *  The vertex is now processed.
+             */
+            vertexStates[u] = .processed
         }
     }
     

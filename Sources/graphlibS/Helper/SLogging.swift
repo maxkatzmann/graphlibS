@@ -33,7 +33,7 @@ public class SLogging {
     /// finish it.
     ///
     /// - Parameter task: The task whos time should be measured.
-    /// - Returns: The duration of the time the task took to finish.
+    /// - Returns: The duration in seconds of the time the task took to finish.
     public static func measureTimeForTask(task: () -> Void) -> Double {
         let startTime = DispatchTime.now()
         task()

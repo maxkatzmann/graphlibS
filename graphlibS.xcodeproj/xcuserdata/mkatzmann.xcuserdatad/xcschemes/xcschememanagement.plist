@@ -14,10 +14,15 @@
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
-		<key>graphlibSPackageTests.xcscheme</key>
+		<key>graphlibSPackageTests Release.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>2</integer>
+		</dict>
+		<key>graphlibSPackageTests.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
 		</dict>
 	</dict>
 </dict>

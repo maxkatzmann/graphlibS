@@ -1,12 +1,12 @@
 # graphlibS
-[![GitHub tag](https://img.shields.io/badge/Version-0.0.12-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.12)
+[![GitHub tag](https://img.shields.io/badge/Version-0.0.13-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.13)
 
 This will (hopefully) become a high performance graph library written in Swift.
 Totally work in progress at the moment. I don't follow a certain schedule
 regarding implementations. Therefore, features will be added whenever I need them
 for a task I'm currently working on.
 
-In order to avoid performance decreases I omit safety checks. This means,
+In order to avoid performance decreases safety checks are ommitted. This means,
 deleting a vertex that is not actually in the graph will lead to a crash, etc.
 
 ---
@@ -53,6 +53,7 @@ here soon.
 ---
 ## License
 GPL-3.0
+
 
 
 
