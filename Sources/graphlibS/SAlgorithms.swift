@@ -35,7 +35,12 @@ public class SAlgorithms {
         var vertexStates = [SVertexState](repeating: .unseen,
                                           count: graph.numberOfVertices)
         
+        /**
+         *  v is the first vertex in our search and we dont't want to process it
+         *  again.
+         */
         var priorityQueue = [v]
+        vertexStates[v] = .seen
         
         while !priorityQueue.isEmpty {
             /**

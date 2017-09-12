@@ -89,6 +89,7 @@ public class SLogging {
             gnuplotCommand += "e\n" +
             "q\n"
         } else if style == .scatter {
+            gnuplotCommand += "set style circle radius 1.0\n"
             gnuplotCommand += "plot '-' using 1:2 with circles\n"
             for i in 0..<x.count {
                 gnuplotCommand += "\(x[i]) \(y[i])\n"
