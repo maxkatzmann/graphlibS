@@ -8,6 +8,11 @@
 
 import Foundation
 
+public enum SLoggingPlotStyle {
+    case line
+    case scatter
+}
+
 public class SLogging {
     
     /**
@@ -62,7 +67,8 @@ public class SLogging {
                                   ymin: Double,
                                   ymax: Double,
                                   toDirectory directoryPath: String,
-                                  withFileName fileName: String) {
+                                  withFileName fileName: String,
+                                  andStyle style: SLoggingPlotStyle) {
         guard x.count == y.count else {
             SLogging.error(message: "Could not plot the passed values as the number of x values and y values did not match.")
             return
@@ -73,13 +79,23 @@ public class SLogging {
         var gnuplotCommand = "set term png\n" +
             "set xrange [\(xmin):\(xmax)]\n" +
             "set yrange [\(ymin):\(ymax)]\n" +
-            "set output \"\(fileName)\"\n" +
-            "plot '-' using 1:2 with lines\n"
-        for i in 0..<x.count {
-            gnuplotCommand += "\(x[i]) \(y[i])\n"
-        }
-        gnuplotCommand += "e\n" +
+            "set output \"\(fileName)\"\n"
+        
+        if style == .line {
+            gnuplotCommand += "plot '-' using 1:2 with lines\n"
+            for i in 0..<x.count {
+                gnuplotCommand += "\(x[i]) \(y[i])\n"
+            }
+            gnuplotCommand += "e\n" +
             "q\n"
+        } else if style == .scatter {
+            gnuplotCommand += "plot '-' using 1:2 with circles\n"
+            for i in 0..<x.count {
+                gnuplotCommand += "\(x[i]) \(y[i])\n"
+            }
+            gnuplotCommand += "e\n" +
+            "q\n"
+        }
         
         /**
          *  Executing the plot command.

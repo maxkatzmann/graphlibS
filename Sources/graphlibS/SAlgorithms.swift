@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum SVertexState: Int {
+public enum SVertexState: Int {
     case unseen = -1
     case seen = 0
     case processed = 1
