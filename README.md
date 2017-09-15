@@ -1,5 +1,5 @@
 # graphlibS
-[![GitHub tag](https://img.shields.io/badge/Version-0.0.15-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.15)
+[![GitHub tag](https://img.shields.io/badge/Version-0.0.16-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.16)
 
 This will (hopefully) become a high performance graph library written in Swift.
 Totally work in progress at the moment. I don't follow a certain schedule
@@ -53,6 +53,7 @@ here soon.
 ---
 ## License
 GPL-3.0
+
 
 
 
