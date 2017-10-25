@@ -111,7 +111,6 @@ public class SAlgorithms {
         for v in 0..<graph.numberOfVertices {
             let numberOfNeighbors = graph.edges[v].count
             
-            
             if numberOfNeighbors < 2 {
                 localClusteringCoefficients[v] = 0.0
             } else {

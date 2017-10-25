@@ -268,6 +268,21 @@ public class SGraph {
         return self.edges[v].count
     }
     
+    
+    /// The maximum degree of the receiver.
+    /// - Complexity: O(|vertices|)
+    /// - Returns: The maximum degree of the receiver.
+    public func maximumDegree() -> Int {
+        var maximumDegree = 0
+        for vertex in 0..<self.numberOfVertices {
+            if degree(of: vertex) > maximumDegree {
+                maximumDegree = degree(of: vertex)
+            }
+        }
+        
+        return maximumDegree
+    }
+    
     //MARK: - Subgraph
     
     /// Obtain the subgraph of the receiver induced by the vertices in the passed set.
