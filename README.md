@@ -1,5 +1,5 @@
 # graphlibS
-[![GitHub tag](https://img.shields.io/badge/Version-0.0.18-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.18)
+[![GitHub tag](https://img.shields.io/badge/Version-0.0.19-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.19)
 
 This will (hopefully) become a high performance graph library written in Swift.
 Totally work in progress at the moment. I don't follow a certain schedule
@@ -23,6 +23,8 @@ deleting a vertex that is not actually in the graph will lead to a crash, etc.
 **Adjacency**
 * check whether two vertices are connected
 * get the degree of a vertex
+* get the maximum degree of a graph
+* get the average degree of a graph
 
 **Subgraph**
 * get the induced subgraph of a graph containing specified vertices
@@ -58,6 +60,7 @@ here soon.
 ---
 ## License
 GPL-3.0
+
 
 
 

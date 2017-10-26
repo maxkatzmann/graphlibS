@@ -283,6 +283,20 @@ public class SGraph {
         return maximumDegree
     }
     
+    
+    /// The average degree of the receiver.
+    ///
+    /// - Complexity: O(|vertices|)
+    /// - Returns: The average degree of the receiver.
+    public func averageDegree() -> Double {
+        var degreeSum = 0
+        for vertex in 0..<self.numberOfVertices {
+            degreeSum += self.degree(of: vertex)
+        }
+        
+        return Double(degreeSum) / Double(self.numberOfVertices)
+    }
+    
     //MARK: - Subgraph
     
     /// Obtain the subgraph of the receiver induced by the vertices in the passed set.
