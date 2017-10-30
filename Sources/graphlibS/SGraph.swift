@@ -60,8 +60,8 @@ public class SGraph {
                 /**
                  *  Skip lines that are actually comments.
                  */
-                if line.characters[line.startIndex] == "#" ||
-                    line.characters[line.startIndex] == "%" {
+                if line[line.startIndex] == "#" ||
+                    line[line.startIndex] == "%" {
                     continue
                 }
                 
@@ -553,7 +553,7 @@ public class SGraph {
     
     /// Determines all connected components of the receiver.
     ///
-    /// - Complexity: Complexits of 'verticesInConnectedComponents' + Complexity of 'subgraph'. (The latter is amortized in O(numberOfVertice * max_degree))
+    /// - Complexity: Complexits of 'verticesInConnectedComponents' + Complexity of 'subgraph'. (The latter is amortized in O(|vertices| * max_degree))
     /// - Returns: An array of tuples, each containing a subgraph representing a connected component of the receiver as well as a dictionary that maps the vertices in the receiver to their counterparts in the induced subgraph. (sorted by component size).
     public func connectedComponents() -> [(SGraph, [Int: Int])] {
         
@@ -585,25 +585,60 @@ public class SGraph {
     /// Creates a string containing the adjacency list of the graph. Each line represents one edge, vertices are seperated by tabs (\t).
     ///
     /// - Complexity: O(numberOfEdges)
+    /// - Parameter useLabels:  Determines whether the vertex indices or the labels of the vertices should be used when printing the graph. (Default false, printing the indices.)
     /// - Returns: A string containing the adjacency list of the graph.
-    public func toString() -> String {
+    public func toString(useLabels: Bool = true) -> String {
         var adjacencyList = ""
         if self.directed {
             for (u, neighbors) in self.edges.enumerated() {
                 for v in neighbors {
-                    adjacencyList.append("\(u)\t\(v)\n")
+                    if useLabels {
+                        if let u = self.vertexLabels[u], let v = self.vertexLabels[v] {
+                            adjacencyList += "\(u)\t\(v)\n"
+                        }
+                    } else {
+                        adjacencyList += "\(u)\t\(v)\n"
+                    }
                 }
             }
         } else {
             for (u, neighbors) in self.edges.enumerated() {
                 for v in neighbors {
                     if u < v {
-                        adjacencyList.append("\(u)\t\(v)\n")
+                        if useLabels {
+                            if let u = self.vertexLabels[u], let v = self.vertexLabels[v] {
+                                adjacencyList += "\(u)\t\(v)\n"
+                            }
+                        } else {
+                            adjacencyList += "\(u)\t\(v)\n"
+                        }
                     }
                 }
             }
         }
         
         return adjacencyList
+    }
+    
+    
+    /// Creates a string that represents the vertex labels dictionary, i.e.
+    /// the map of the indices to the labels of the vertices.
+    /// By default each line has the form: index\tlabel
+    /// If the inverted flag is set, each line has the form: label\tindex
+    ///
+    /// - Parameter inverted: If inverted the map from the labels to the indices will be printed instead. (Default is false.)
+    /// - Complexity: O(|vertices|)
+    /// - Returns: A string representing the index -> label map.
+    public func vertexLabelsToString(inverted: Bool = false) -> String {
+        var vertexLabelString = ""
+        for (vertex, label) in self.vertexLabels {
+            if inverted {
+                vertexLabelString += "\(label)\t\(vertex)\n"
+            } else {
+                vertexLabelString += "\(vertex)\t\(label)\n"
+            }
+        }
+        
+        return vertexLabelString
     }
 }
