@@ -57,6 +57,14 @@ public class SGraph {
              *  Iterate the lines of the file.
              */
             while let line = inputStreamReader.nextLine() {
+                
+                /**
+                 *  When the line is empty, we simply ignore it.
+                 */
+                guard !line.isEmpty else {
+                    continue
+                }
+                
                 /**
                  *  Skip lines that are actually comments.
                  */
