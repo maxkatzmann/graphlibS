@@ -189,9 +189,56 @@ class graphlibSTests: XCTestCase {
                   "The degree of vertex 4 was \(subgraph.degree(of: vertexMap[4]!)) instead of 0!")
     }
     
+    func testDFS() {
+        /**
+         *  Create a graph with 6 vertices and two components.
+         */
+        let G = SGraph(numberOfVertices: 6, directed: false)
+        
+        /**
+         *  One component contains the vertices 0...3
+         */
+        G.addEdge(from: 0, to: 1)
+        G.addEdge(from: 0, to: 2)
+        G.addEdge(from: 1, to: 2)
+        G.addEdge(from: 2, to: 3)
+        
+        /**
+         *  The second component contains the vertices 4...5
+         */
+        G.addEdge(from: 4, to: 5)
+        
+        /**
+         *  Now we perform two DFS. One in one component and one in the other.
+         *  Then we check whether in both runs we found the correct vertices.
+         */
+        
+        let component1 = Set<Int>([0, 1, 2, 3])
+        let component2 = Set<Int>([4, 5])
+        
+        var allegedComponent1 = Set<Int>([0])
+        SAlgorithms.depthFirstSearch(in: G, startingAt: 0, performingTaskOnSeenVertex: {
+            (vertex, _) in
+            allegedComponent1.insert(vertex)
+            
+            return true
+        })
+        XCTAssert(component1 == allegedComponent1, "The component 1 found by the DFS was not correct.")
+        
+        var allegedComponent2 = Set<Int>([4])
+        SAlgorithms.depthFirstSearch(in: G, startingAt: 4, performingTaskOnSeenVertex: {
+            (vertex, _) in
+            allegedComponent2.insert(vertex)
+            
+            return true
+        })
+        XCTAssert(component2 == allegedComponent2, "The component 2 found by the DFS was not correct.")
+    }
+    
     static var allTests = [
         ("testLargestConnectedComponent", testLargestConnectedComponent),
         ("testConnectedComponents", testConnectedComponents),
-        ("testSubgraph", testSubgraph)
+        ("testSubgraph", testSubgraph),
+        ("testDFS", testDFS)
     ]
 }

@@ -1,5 +1,5 @@
 # graphlibS
-[![GitHub tag](https://img.shields.io/badge/Version-0.0.21-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.21)
+[![GitHub tag](https://img.shields.io/badge/Version-0.0.22-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.22)
 
 This will (hopefully) become a high performance graph library written in Swift.
 Totally work in progress at the moment. I don't follow a certain schedule
@@ -44,6 +44,7 @@ deleting a vertex that is not actually in the graph will lead to a crash, etc.
 
 ## Current Algorithms
 * Breadth First Search starting at a specified vertex.
+* Depth First Search starting at a specified vertex.
 * Determining the local clustering coefficients of the vertices in the graph
 
 ---
@@ -60,6 +61,7 @@ here soon.
 ---
 ## License
 GPL-3.0
+
 
 
 

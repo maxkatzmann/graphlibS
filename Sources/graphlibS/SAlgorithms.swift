@@ -85,6 +85,96 @@ public class SAlgorithms {
         }
     }
     
+    /// Performs a Depth First Search in the graph starting at a given vertex
+    /// and executes a task for each vertex found.
+    ///
+    /// - Complexity: O((numberOfNodes + numberOfEdges) * Complexity of 'task')
+    /// - Parameters:
+    ///   - graph: The graph in which the DFS is to be perfomed.
+    ///   - vertex: The vertex where the DFS should start.
+    ///   - task: A closure that gets called for each (vertex, parent) that is found during the DFS. The closure returns a boolean value indicating whether this node should be further explored or not.
+    public static func depthFirstSearch(in graph: SGraph, startingAt v: Int, performingTaskOnSeenVertex task: (Int, Int) -> (Bool)) {
+        
+        /**
+         *  The priority queue will hold all vertices that we have encountered
+         *  but not explored, yet.
+         */
+        var vertexStates = [SVertexState](repeating: .unseen,
+                                          count: graph.numberOfVertices)
+        
+        /**
+         *  We keep track of which vertex is the parent in the DFS tree using
+         *  this array.
+         */
+        var parentOf = [Int](repeating: -1,
+                             count: graph.numberOfVertices)
+        
+        /**
+         *  v itself will not be processed later on.
+         */
+        vertexStates[v] = .processed
+        
+        /**
+         *  We start with a neighbor of v.
+         */
+        var priorityStack = [Int]()
+        
+        /**
+         *  Add the neighbors of v to the priority stack and remember that
+         *  v is their parent in the DFS tree.
+         */
+        for neighbor in graph.edges[v] {
+            priorityStack.append(neighbor)
+            parentOf[neighbor] = v
+        }
+        
+        while !priorityStack.isEmpty {
+            /**
+             *  Get the vertex to explore next.
+             */
+            let u = priorityStack.removeLast()
+            if vertexStates[u] == .unseen {
+                vertexStates[u] = .seen
+                
+                /**
+                 *  We're about to add the neighbor to the priority stack in
+                 *  order to be processed later. Beforehand we pass it to the
+                 *  task (along with its parent 'u' in the BFS tree) which
+                 *  processes the vertex and returns 'true' if the vertex should
+                 *  be processed. If the task returns 'false' we do not process
+                 *  the vertex.
+                 */
+                if task(u, parentOf[u]) {
+                    
+                    /**
+                     *  We can now add the newly seen neighbors to the priority
+                     *  stack such that they can be explored later.
+                     */
+                    for neighbor in graph.edges[u] {
+                        if vertexStates[neighbor] == .unseen {
+                            
+                            /**
+                             *  Add the neighbor to the stack since we want
+                             *  to process it later.
+                             */
+                            priorityStack.append(neighbor)
+                            
+                            /**
+                             *  Remember that u was the parent of the neighbor.
+                             */
+                            parentOf[neighbor] = u
+                        }
+                    }
+                }
+                
+                /**
+                 *  The vertex is now processed.
+                 */
+                vertexStates[u] = .processed
+            }
+        }
+    }
+    
     //MARK: - Clustering
     
     /// Determines the local clustering coefficients for all vertices in the graph
