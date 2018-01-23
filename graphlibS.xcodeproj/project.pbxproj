@@ -25,6 +25,8 @@
 		28387E6D1FC731B400090D6F /* SGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* SGraph.swift */; };
 		28387E6E1FC731D600090D6F /* SLogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* SLogging.swift */; };
 		28387E6F1FC731D600090D6F /* SStreamReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* SStreamReader.swift */; };
+		287230AC2010EF42000D438B /* SAttributedGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287230AA2010EC69000D438B /* SAttributedGraph.swift */; };
+		287230AD2010EF43000D438B /* SAttributedGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287230AA2010EC69000D438B /* SAttributedGraph.swift */; };
 		OBJ_26 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
 		OBJ_32 /* graphlibSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* graphlibSTests.swift */; };
 		OBJ_34 /* graphlibS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "graphlibS::graphlibS::Product" /* graphlibS.framework */; };
@@ -53,6 +55,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		287230AA2010EC69000D438B /* SAttributedGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SAttributedGraph.swift; sourceTree = "<group>"; };
 		OBJ_10 /* SLogging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLogging.swift; sourceTree = "<group>"; };
 		OBJ_11 /* SStreamReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SStreamReader.swift; sourceTree = "<group>"; };
 		OBJ_12 /* SAlgorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SAlgorithms.swift; sourceTree = "<group>"; };
@@ -132,6 +135,7 @@
 			children = (
 				OBJ_14 /* graphlibS.swift */,
 				OBJ_13 /* SGraph.swift */,
+				287230AA2010EC69000D438B /* SAttributedGraph.swift */,
 				OBJ_12 /* SAlgorithms.swift */,
 				OBJ_9 /* Helper */,
 			);
@@ -243,6 +247,7 @@
 				28387E6F1FC731D600090D6F /* SStreamReader.swift in Sources */,
 				OBJ_32 /* graphlibSTests.swift in Sources */,
 				28387E6C1FC7312E00090D6F /* SAlgorithms.swift in Sources */,
+				287230AD2010EF43000D438B /* SAttributedGraph.swift in Sources */,
 				28387E6E1FC731D600090D6F /* SLogging.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -255,6 +260,7 @@
 				OBJ_42 /* SStreamReader.swift in Sources */,
 				OBJ_43 /* SAlgorithms.swift in Sources */,
 				OBJ_44 /* SGraph.swift in Sources */,
+				287230AC2010EF42000D438B /* SAttributedGraph.swift in Sources */,
 				OBJ_45 /* graphlibS.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

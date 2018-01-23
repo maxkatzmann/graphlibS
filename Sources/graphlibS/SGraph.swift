@@ -8,15 +8,26 @@
 
 import Foundation
 
-public class SGraph {
+public class SGraph: Sequence {
+    
+    //MARK: - Properties
+    
+    /// The edges of the graph.  Array at the ith position contains the indices
+    /// of the neighbors of the ith node.
     public var edges: [[Int]] = []
+    
+    /// Internally each vertex is identified using an index.  This dictionary,
+    /// maps the nodes label (e.g. the name of the node in a file) to this index.
     public private(set) var vertexLabels: [Int: String] = [:]
+    
+    /// The number of nodes in the network.
     public var numberOfVertices: Int {
         get {
             return edges.count
         }
     }
     
+    /// A Bool indicating whether the graph is directed or not.
     public let directed: Bool
     
     //MARK: - Initiazlization
@@ -133,8 +144,20 @@ public class SGraph {
         }
     }
     
-    //MARK: - Vertices and Edges
+    //MARK: - Sequence Protocol
     
+    
+    /// This allows us to iterate the vertices of the graph as
+    /// ````
+    /// for vertex in graph {
+    ///     ...
+    /// }
+    /// ````
+    public func makeIterator() -> CountableRange<Int>.Iterator {
+        return (0..<self.numberOfVertices).makeIterator()
+    }
+    
+    //MARK: - Vertices and Edges
     
     /// Add a vertex to the graph.
     ///
@@ -150,7 +173,7 @@ public class SGraph {
     ///
     /// - Complexity: O(numberOfEdges).
     /// - Parameter v: The index of the vertex to be removed
-    public func removeVertex(v: Int) {
+    public func removeVertex(_ v: Int) {
         
         /**
          *  Removing the vertex and its neighbors.
@@ -212,8 +235,11 @@ public class SGraph {
         
         /**
          *  If the graph is undirected we also add the edge in the other direction.
+         *
+         *  Also if we u = v, we just added a self loop.
+         *  We don't want to add it again.
          */
-        if !self.directed {
+        if !self.directed && u != v {
             self.edges[v].append(u)
         }
         
@@ -234,15 +260,45 @@ public class SGraph {
             return false
         }
         
-        if let vIndexInU = self.edges[u].index(of: v),
-            let uIndexInV = self.edges[v].index(of: u) {
+        var removedSuccessful = true
+        
+        /**
+         *  Determine the position of neighbor v in the edges array of u.
+         */
+        if let vIndexInU = self.edges[u].index(of: v) {
+            
+            /**
+             *  Delete the edge and the corresponding attribute.
+             */
             self.edges[u].remove(at: vIndexInU)
-            self.edges[v].remove(at: uIndexInV)
-            return true
+            
         } else {
             SLogging.error(message: "Tried to remove an edge that apparently doesn't exist.")
-            return false
+            removedSuccessful = false
         }
+        
+        /**
+         *  If the graph is undirected, we actually have to delete two edges.
+         */
+        if !self.directed {
+            
+            /**
+             *  Determine the position of u in the edges array of neighbor v.
+             */
+            if let uIndexInV = self.edges[v].index(of: u) {
+                
+                /**
+                 *  Delete the edge and the corresponding attribute.
+                 */
+                self.edges[v].remove(at: uIndexInV)
+
+            } else {
+                SLogging.error(message: "Tried to remove an edge that apparently doesn't exist.")
+                removedSuccessful = false
+            }
+        }
+        
+        return removedSuccessful
     }
     
     //MARK: - Adjacency
@@ -586,6 +642,66 @@ public class SGraph {
         }
         
         return components
+    }
+    
+    //MARK: - Contraction
+    
+    
+    /// Contracts a graph using the vertex assignments in the passed contractions
+    /// array.  That is, the integers in the contractions array go from 0 to
+    /// <number of vertices in contracted graph> and the integer at the ith position
+    /// of the contractions array determines the vertex that the ith vertex is
+    /// contracted into.
+    ///
+    /// - Note: If the numbers in the contractions array are not consecutive, the resulting graph will have isolated nodes.
+    ///
+    /// - Complexity: O(m * <complexity of adding an edge>)
+    /// - Parameter contractions: An array where the ith entry contains the index of the vertex (in the resulting, contracted graph) that vertex i is contracted into.
+    /// - Returns: An SGraph representing the contracted graph.
+    public func graphByApplyingContractions(_ contractions: [Int]) -> SGraph? {
+        
+        /**
+         *  Determine the number of nodes in the contracted graph.
+         */
+        if let largestContractedVertexID = contractions.max() {
+            
+            /**
+             *  Construct the graph with the contracted nodes.
+             */
+            let contractedGraph = SGraph(numberOfVertices: largestContractedVertexID + 1,
+                                         directed: self.directed)
+            
+            /**
+             *  Now we iterate the edges of the initial graph and construct the
+             *  edges in the contracted graph.
+             */
+            for (vertex, neighbors) in self.edges.enumerated() {
+                
+                /**
+                 *  The contracted vertex that the current vertex was contracted into.
+                 */
+                let contractedVertex = contractions[vertex]
+                
+                for neighbor in neighbors {
+                    
+                    /**
+                     *  The contracted vertex that the neighbor was contracted into.
+                     */
+                    let contractedNeighbor = contractions[neighbor]
+                    
+                    /**
+                     *  Add the edge.
+                     */
+                    contractedGraph.addEdge(from: contractedVertex,
+                                            to: contractedNeighbor)
+                }
+            }
+            
+            return contractedGraph
+            
+        } else {
+            return nil
+        }
     }
     
     //MARK: - Writing

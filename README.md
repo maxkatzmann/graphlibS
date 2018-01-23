@@ -1,5 +1,5 @@
 # graphlibS
-[![GitHub tag](https://img.shields.io/badge/Version-0.0.22-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.22)
+[![GitHub tag](https://img.shields.io/badge/Version-0.0.23-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.23)
 
 This will (hopefully) become a high performance graph library written in Swift.
 Totally work in progress at the moment. I don't follow a certain schedule
@@ -15,6 +15,7 @@ deleting a vertex that is not actually in the graph will lead to a crash, etc.
 **Initialization**
 * Read a (directed or undirected) graph from a file
 * Create a graph programmatically
+* Assign attributes to vertices and edges
 
 **Manipulation**
 * add vertices / edges
@@ -37,6 +38,9 @@ deleting a vertex that is not actually in the graph will lead to a crash, etc.
 * get a subgraph representing the largest connected component of a graph
 * get the subgraphs representing all connected components of a graph
 
+**Contraction**
+* obtain a graph by contracting groups of vertices to single vertices
+
 **Output**
 * print the adjacency list of a graph
 
@@ -56,11 +60,13 @@ here soon.
 ---
 
 ## Known Issues
- * Mutli-edges and self-loops are not supported
+ * Mutli-edges are not supported
+ * Self-loops should be supported but are not tested.
 
 ---
 ## License
 GPL-3.0
+
 
 
 

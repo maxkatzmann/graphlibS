@@ -223,7 +223,8 @@ class graphlibSTests: XCTestCase {
             
             return true
         })
-        XCTAssert(component1 == allegedComponent1, "The component 1 found by the DFS was not correct.")
+        XCTAssert(component1 == allegedComponent1,
+                  "The component 1 found by the DFS was not correct.")
         
         var allegedComponent2 = Set<Int>([4])
         SAlgorithms.depthFirstSearch(in: G, startingAt: 4, performingTaskOnSeenVertex: {
@@ -232,13 +233,79 @@ class graphlibSTests: XCTestCase {
             
             return true
         })
-        XCTAssert(component2 == allegedComponent2, "The component 2 found by the DFS was not correct.")
+        XCTAssert(component2 == allegedComponent2,
+                  "The component 2 found by the DFS was not correct.")
+    }
+    
+    func testContraction() {
+        
+        let graph = SGraph(numberOfVertices: 5,
+                           directed: false)
+        
+        graph.addEdge(from: 0, to: 1)
+        graph.addEdge(from: 0, to: 2)
+        graph.addEdge(from: 1, to: 2)
+        graph.addEdge(from: 2, to: 3)
+        graph.addEdge(from: 3, to: 4)
+        
+        let contractions = [0, 1, 1, 1, 2]
+        
+        if let contractedGraph = graph.graphByApplyingContractions(contractions) {
+            
+            /**
+             *  Check if the contracted graph is what we wanted.
+             */
+            assert(contractedGraph.numberOfVertices == 3,
+                   "The contracted graph should have 3 vertices. It has \(contractedGraph.numberOfVertices) though.")
+            
+            assert(contractedGraph.adjacent(u: 0, v: 1), "0 and 1 should be neighbors. They are not.")
+            assert(contractedGraph.adjacent(u: 1, v: 2), "1 and 2 should be neighbors. They are not.")
+            assert(!contractedGraph.adjacent(u: 0, v: 2), "0 and 2 are neighbors. They should not be.")
+            assert(contractedGraph.adjacent(u: 1, v: 1), "There should be a self-loop from 1 to 1. There is not.")
+            assert(!contractedGraph.adjacent(u: 2, v: 2), "There should not be a self-loop from 2 to 2. There is.")
+            assert(!contractedGraph.adjacent(u: 0, v: 0), "There should not be a self-loop from 0 to 0. There is.")
+        } else {
+            assertionFailure("The contracted graph was nil. It shouldn't be!")
+        }
+        
+        // Directed Case
+        
+        let directedGraph = SGraph(numberOfVertices: 5,
+                                   directed: true)
+        
+        directedGraph.addEdge(from: 0, to: 1)
+        directedGraph.addEdge(from: 0, to: 2)
+        directedGraph.addEdge(from: 1, to: 2)
+        directedGraph.addEdge(from: 2, to: 3)
+        directedGraph.addEdge(from: 4, to: 3)
+        
+        if let contractedDirectedGraph = directedGraph.graphByApplyingContractions(contractions) {
+            /**
+             *  Check if the contracted graph is what we wanted.
+             */
+            assert(contractedDirectedGraph.numberOfVertices == 3,
+                   "The contracted directed graph should have 3 vertices. It has \(contractedDirectedGraph.numberOfVertices) though.")
+            
+            assert(contractedDirectedGraph.adjacent(u: 0, v: 1), "1 should be neighbor of 0. It is not.")
+            assert(!contractedDirectedGraph.adjacent(u: 1, v: 0), "0 should not be neighbor of 1. It is.")
+            assert(contractedDirectedGraph.adjacent(u: 1, v: 1), "There should be a self-loop from 1 to 1. There is not.")
+            assert(!contractedDirectedGraph.adjacent(u: 1, v: 2), "2 should not be neighbor of 1. It is.")
+            assert(contractedDirectedGraph.adjacent(u: 2, v: 1), "1 should be neighbor of 2. It is not.")
+            assert(!contractedDirectedGraph.adjacent(u: 0, v: 2), "2 should not be neighbor of 0. It is.")
+            assert(!contractedDirectedGraph.adjacent(u: 2, v: 0), "0 should not be neighbor of 2. It is.")
+            assert(!contractedDirectedGraph.adjacent(u: 2, v: 2), "There should not be a self-loop from 2 to 2. There is.")
+            assert(!contractedDirectedGraph.adjacent(u: 0, v: 0), "There should not be a self-loop from 0 to 0. There is.")
+        } else {
+            assertionFailure("The contracted directed graph was nil. It shouldn't be!")
+        }
+        
     }
     
     static var allTests = [
         ("testLargestConnectedComponent", testLargestConnectedComponent),
         ("testConnectedComponents", testConnectedComponents),
         ("testSubgraph", testSubgraph),
-        ("testDFS", testDFS)
+        ("testDFS", testDFS),
+        ("testContraction", testContraction)
     ]
 }
