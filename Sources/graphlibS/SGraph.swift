@@ -32,10 +32,12 @@ public class SGraph: Sequence {
     
     //MARK: - Initiazlization
     
-    /// Default initializer.
+    /// Default initializer that creates a graph containing the specified
+    /// number of isolated vertices.
     ///
-    /// - Complexity: O(numberOfVertices)
-    /// - Parameter directed: Bool indicating whether the graph is directed.
+    /// - Parameters:
+    ///   - numberOfVertices: The number of vertices that the graph should have.
+    ///   - directed: Bool indicating whether the graph is directed. The default value is 'false'.
     public init(numberOfVertices: Int = 0, directed: Bool = false) {
         self.directed = directed
         
@@ -44,11 +46,101 @@ public class SGraph: Sequence {
         }
     }
     
+    
+    /// Initializer that generates a graph from an edge list stored in a string.
+    /// - Note: When reading an edge list from a file, use the init(filePath:directed:) method for increased performance.
+    ///
+    /// - Parameters:
+    ///   - edgeList: A string containing the edge list representing the graph.
+    ///   - directed: Bool indicating whether the graph is directed. The default value is 'false'.
+    public init(edgeList: String, directed: Bool = false) {
+        self.directed = directed
+        
+        /**
+         *  Auxiliary dictionary to quickly recognize whether a vertex
+         *  was assigned an index already.
+         */
+        var indexForVertexLabel: [String: Int] = [:]
+        var numberOfEdges = 0
+        
+        edgeList.enumerateLines {
+            (line: String, stop: inout Bool) in
+            
+            /**
+             *  When the line is empty, we simply ignore it. Additionally,
+             *  we skip lines that are actually comments.
+             */
+            if !line.isEmpty
+                && line[line.startIndex] != "#"
+                && line[line.startIndex] != "%" {
+                
+                /**
+                 *  Each line should contain two strings seperated by
+                 *  whitespaces or tabs.
+                 */
+                let lineComponents = line.components(separatedBy: CharacterSet.whitespaces)
+                if lineComponents.count != 2 {
+                    SLogging.error(message: "There was a line that did not consist of a vertex pair.")
+                } else {
+                    /**
+                     *  Get the index for the first vertex
+                     */
+                    let label1 = lineComponents[0]
+                    var index1 = indexForVertexLabel[label1]
+                    if index1 == nil {
+                        /**
+                         *  If the vertex does not have an index yet, it will get
+                         *  the next available index.
+                         */
+                        index1 = self.edges.count
+                        indexForVertexLabel[label1] = index1!
+                        
+                        /**
+                         *  Make sure we later know which vertex belongs to which
+                         *  index and afterwards reserve the neighbor array for
+                         */
+                        self.vertexLabels[index1!] = label1
+                        self.edges.append([])
+                    }
+                    
+                    /**
+                     *  Get the index for the second vertex
+                     */
+                    let label2 = lineComponents[1]
+                    var index2 = indexForVertexLabel[label2]
+                    if index2 == nil {
+                        /**
+                         *  If the vertex does not have an index yet, it will get
+                         *  the next available index.
+                         */
+                        index2 = self.edges.count
+                        indexForVertexLabel[label2] = index2!
+                        
+                        /**
+                         *  Make sure we later know which vertex belongs to which
+                         *  index and afterwards reserve the neighbor array for
+                         */
+                        self.vertexLabels[index2!] = label2
+                        self.edges.append([])
+                    }
+                    
+                    self.edges[index1!].append(index2!)
+                    if !directed {
+                        self.edges[index2!].append(index1!)
+                    }
+                    numberOfEdges += 1
+                }
+            }
+            
+            stop = false
+        }
+    }
+    
     /// Initializer that reads the graph from an adjacency list stored in a file.
     ///
     /// - Parameters:
     ///   - filePath: The path to the file that the graph should be read from.
-    ///   - directed: Bool indicating whether the graph should be treated as directed or not.
+    ///   - directed: Bool indicating whether the graph should is directed. The default value is 'false'.
     public init(filePath: String, directed: Bool = false) {
         self.directed = directed
         
@@ -359,6 +451,16 @@ public class SGraph: Sequence {
         }
         
         return Double(degreeSum) / Double(self.numberOfVertices)
+    }
+    
+    
+    /// Returns the neighbors of a vertex. This is just a wrapper for accessing
+    /// the edges array.
+    ///
+    /// - Parameter v: The vertex whose neighbors are to be obtained.
+    /// - Returns: The neighbors of that vertex.
+    public func neighborsOf(_ v: Int) -> [Int] {
+        return self.edges[v]
     }
     
     //MARK: - Subgraph
@@ -728,7 +830,7 @@ public class SGraph: Sequence {
         } else {
             for (u, neighbors) in self.edges.enumerated() {
                 for v in neighbors {
-                    if u < v {
+                    if u <= v {
                         if useLabels {
                             if let u = self.vertexLabels[u], let v = self.vertexLabels[v] {
                                 adjacencyList += "\(u)\t\(v)\n"

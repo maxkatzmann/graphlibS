@@ -301,11 +301,87 @@ class graphlibSTests: XCTestCase {
         
     }
     
+    func testLouvainCommunityDetection() {
+        
+        let graph = SAttributedGraph(numberOfVertices: 12)
+        
+        /**
+         *  First clique.
+         */
+        graph.addEdge(from: 0, to: 1)
+        graph.addEdge(from: 0, to: 2)
+        graph.addEdge(from: 0, to: 3)
+        graph.addEdge(from: 1, to: 2)
+        graph.addEdge(from: 1, to: 3)
+        graph.addEdge(from: 2, to: 3)
+        
+        /**
+         *  Second clique
+         */
+        graph.addEdge(from: 4, to: 5)
+        graph.addEdge(from: 4, to: 6)
+        graph.addEdge(from: 4, to: 7)
+        graph.addEdge(from: 5, to: 6)
+        graph.addEdge(from: 5, to: 7)
+        graph.addEdge(from: 6, to: 7)
+        
+        /**
+         *  Third clique
+         */
+        graph.addEdge(from: 8, to: 9)
+        graph.addEdge(from: 8, to: 10)
+        graph.addEdge(from: 8, to: 11)
+        graph.addEdge(from: 9, to: 10)
+        graph.addEdge(from: 9, to: 11)
+        graph.addEdge(from: 10, to: 11)
+        
+        /**
+         *  The connections between the cliques.
+         */
+        graph.addEdge(from: 3, to: 4)
+        graph.addEdge(from: 7, to: 8)
+        graph.addEdge(from: 11, to: 0)
+        
+        /**
+         *  All edges have weight 1.
+         */
+        for vertex in graph {
+            for neighbor in graph.edges[vertex] {
+                graph.setEdgeAttributeValue(forEdgeFrom: vertex,
+                                            to: neighbor,
+                                            attributeName: SEdgeAttribute.weight.rawValue,
+                                            value: 1.0)
+            }
+        }
+
+        if let (communityOfVertex, _) = SAlgorithms.louvainCommunities(of: graph) {
+            /**
+             *  All vertices that belong to a 4-clique should be in the same community.
+             */
+            assert(communityOfVertex[0] == communityOfVertex[1]
+                && communityOfVertex[1] == communityOfVertex[2]
+                && communityOfVertex[2] == communityOfVertex[3],
+                   "The first clique did not end up in the one cluster.")
+            
+            assert(communityOfVertex[4] == communityOfVertex[5]
+                && communityOfVertex[5] == communityOfVertex[6]
+                && communityOfVertex[6] == communityOfVertex[7],
+                   "The second clique did not end up in the one cluster.")
+            assert(communityOfVertex[8] == communityOfVertex[9]
+                && communityOfVertex[9] == communityOfVertex[10]
+                && communityOfVertex[10] == communityOfVertex[11],
+                   "The first clique did not end up in the one cluster.")
+        } else {
+            assertionFailure("We didn't get a clustering for the connected cliques graph.")
+        }
+    }
+    
     static var allTests = [
         ("testLargestConnectedComponent", testLargestConnectedComponent),
         ("testConnectedComponents", testConnectedComponents),
         ("testSubgraph", testSubgraph),
         ("testDFS", testDFS),
-        ("testContraction", testContraction)
+        ("testContraction", testContraction),
+        ("testLouvainCommunityDetection", testLouvainCommunityDetection)
     ]
 }

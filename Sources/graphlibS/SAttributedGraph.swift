@@ -46,13 +46,18 @@ public class SAttributedGraph: SGraph {
     
     //MARK: - Initialization
     
-    public override init(filePath: String, directed: Bool) {
-        super.init(filePath: filePath, directed: directed)
+    public override init(numberOfVertices: Int, directed: Bool = false) {
+        super.init(numberOfVertices: numberOfVertices, directed: directed)
         self.initializeEmptyAttributes()
     }
     
-    public override init(numberOfVertices: Int, directed: Bool) {
-        super.init(numberOfVertices: numberOfVertices, directed: directed)
+    public override init(edgeList: String, directed: Bool = false) {
+        super.init(edgeList: edgeList, directed: directed)
+        self.initializeEmptyAttributes()
+    }
+    
+    public override init(filePath: String, directed: Bool = false) {
+        super.init(filePath: filePath, directed: directed)
         self.initializeEmptyAttributes()
     }
     
@@ -131,9 +136,11 @@ public class SAttributedGraph: SGraph {
             self.edgeAttributes[u].append([String: Any]())
             
             /**
-             *  If the graph is undirected we also added the edge in the other direction.
+             *  If the graph is undirected we also added the edge in the other direction,
+             *  but only if we're not currently dealing with a self-loop.
              */
-            if !self.directed {
+            if !self.directed
+                && u != v {
                 self.edgeAttributes[v].append([String: Any]())
             }
         }
@@ -268,6 +275,40 @@ public class SAttributedGraph: SGraph {
                         action(contractedGraph, vertex, neighbor)
                     }
                 }
+                
+                /**
+                 *  Now we update the contained vertices in the contracted graph.
+                 */
+                
+                /**
+                 *  Get the vertices that are contained in this vertex.
+                 *  The current vertex might already contain other vertices.
+                 */
+                var containedVerticesToAdd = self.vertexAttributes[vertex][SVertexAttribute.containedVertices.rawValue] as? [Int]
+                
+                /**
+                 *  If the vertex did not contain any other vertices,
+                 *  it is a vertex in the original graph, which means
+                 *  it is itself added as a contained vertex.
+                 */
+                if containedVerticesToAdd == nil {
+                    containedVerticesToAdd = [vertex]
+                }
+                
+                /**
+                 *  If the contracted vertex already contains other vertices,
+                 *  we add our contained vertices.
+                 */
+                if let containedVerticesToAdd = containedVerticesToAdd,
+                    let containedVerticesInContractedVertex = contractedGraph.vertexAttributes[contractedVertex][SVertexAttribute.containedVertices.rawValue] as? [Int] {
+                    contractedGraph.vertexAttributes[contractedVertex][SVertexAttribute.containedVertices.rawValue] = containedVerticesInContractedVertex + containedVerticesToAdd
+                } else {
+                    /**
+                     *  If the contracted vertex did not contain other vertices,
+                     *  we set our contained vertices to be its contained vertices.
+                     */
+                    contractedGraph.vertexAttributes[contractedVertex][SVertexAttribute.containedVertices.rawValue] = containedVerticesToAdd
+                }
             }
             
             return contractedGraph
@@ -321,7 +362,15 @@ public class SAttributedGraph: SGraph {
             return false
         }
         
-        if !self.directed {
+        /**
+         *  If the graph is undirected, we also update the edge weight in the
+         *  other direction.
+         *
+         *  We only do this, if we're not currently dealing with a self-loop,
+         *  as else we would be setting the value twice.
+         */
+        if !self.directed
+            && u != v {
             if let indexOfUAmongNeighborsOfV = self.edges[v].index(of: u) {
                 self.edgeAttributes[v][indexOfUAmongNeighborsOfV][attributeName] = value
             } else {

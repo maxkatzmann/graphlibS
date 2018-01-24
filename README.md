@@ -49,7 +49,8 @@ deleting a vertex that is not actually in the graph will lead to a crash, etc.
 ## Current Algorithms
 * Breadth First Search starting at a specified vertex.
 * Depth First Search starting at a specified vertex.
-* Determining the local clustering coefficients of the vertices in the graph
+* Determining the local clustering coefficients of the vertices in the graph.
+* Louvain algorithm for community detection.
 
 ---
 
