@@ -1,5 +1,5 @@
 # graphlibS
-[![GitHub tag](https://img.shields.io/badge/Version-0.0.23-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.23)
+[![GitHub tag](https://img.shields.io/badge/Version-0.0.25-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.25)
 
 This will (hopefully) become a high performance graph library written in Swift.
 Totally work in progress at the moment. I don't follow a certain schedule
@@ -63,10 +63,13 @@ here soon.
 ## Known Issues
  * Mutli-edges are not supported
  * Self-loops should be supported but are not tested.
+ * Most graph manipulations (like getting subgraphs) don't keep track
+   of the attributes in attributed graphs.
 
 ---
 ## License
 GPL-3.0
+
 
 
 
