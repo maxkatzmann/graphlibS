@@ -15,11 +15,11 @@ import Foundation
 /// use SEdgeAttribute.weight.rawValue instead of "weight", and the compiler will complain,
 /// if you type it wrong.
 
-enum SEdgeAttribute: String {
+public enum SEdgeAttribute: String {
     case weight = "SEdgeAttribute.weight"
 }
 
-enum SVertexAttribute: String {
+public enum SVertexAttribute: String {
     case containedVertices = "SVertexAttribute.containedVertices"
 }
 
