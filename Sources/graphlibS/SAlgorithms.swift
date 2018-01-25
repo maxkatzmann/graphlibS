@@ -265,8 +265,10 @@ public class SAlgorithms {
     ///
     /// - Complexity: Heuristic approach, no concrete complexity.
     /// - Parameter graph: An undirected(!) graph whose nodes are to be sorted into communities.
+    /// - Parameter passThreshold: Determines after how many passes the algorithm should stop. The default value is Int.max so the algorithm stops when the modularity was not improved in the last pass.
     /// - Returns: A tuple containing an array where the ith position denotes the community of vertex i and a Double representing the achieved modularity. The communites are numbered consecutively starting at 0 and are sorted by decreasing size of the community.
-    public static func louvainCommunities(of graph: SAttributedGraph) -> ([Int], Double)? {
+    public static func louvainCommunities(of graph: SAttributedGraph,
+                                          stoppingAfterPass passThreshold: Int = Int.max) -> ([Int], Double)? {
         
         /**
          *  Make sure the input is an undirected graph.
@@ -631,7 +633,8 @@ public class SAlgorithms {
         
         /**
          *  We repeatadly perform passes of the louvain algorithm until the
-         *  modularity is no longer increased.
+         *  modularity is no longer increased (or the number of passes exceeds
+         *  the pass threshold).
          */
         
         /**
@@ -647,9 +650,26 @@ public class SAlgorithms {
         
         var maximumModularity = -Double.greatestFiniteMagnitude
         
+        /**
+         *  Keeping track whether the modularity improved in the previous pass.
+         */
         var modularityImprovedInPreviousPass = true
         
-        while modularityImprovedInPreviousPass {
+        /**
+         *  We keep track of how many passes we did.
+         */
+        var numberOfPasses = 0
+        
+        /**
+         *  We iterate as long as there was a modularity improvement in the previous pass,
+         *  or as long as the number of passes has not exceeded the defined passThreshold.
+         */
+        while modularityImprovedInPreviousPass && numberOfPasses <= passThreshold {
+            
+            /**
+             *  We're now doing another pass.
+             */
+            numberOfPasses += 1
             
             /**
              *  Apply one pass of the louvain algorithm.
