@@ -376,6 +376,22 @@ class graphlibSTests: XCTestCase {
         }
     }
     
+    func testClusteringCoefficients() {
+        let graph = SGraph(numberOfVertices: 7)
+        graph.addEdge(from: 0, to: 1)
+        graph.addEdge(from: 0, to: 2)
+        graph.addEdge(from: 0, to: 3)
+        graph.addEdge(from: 1, to: 2)
+        graph.addEdge(from: 2, to: 4)
+        graph.addEdge(from: 2, to: 5)
+        graph.addEdge(from: 2, to: 6)
+        
+        let clusteringCoefficientOfVertex = SAlgorithms.localClusteringCoefficientDistribution(of: graph)
+        
+        assert(clusteringCoefficientOfVertex[1] == 1.0,
+               "The clustering coefficient of vertex 1 should be 1.0, it is \(clusteringCoefficientOfVertex[1]) instead.")
+    }
+    
     static var allTests = [
         ("testLargestConnectedComponent", testLargestConnectedComponent),
         ("testConnectedComponents", testConnectedComponents),

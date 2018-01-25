@@ -185,6 +185,7 @@ public class SAlgorithms {
     /// - Parameter graph: The graph whose local clustering coefficiens are to be determined
     /// - Returns: An array of Double values representing the local clustering coefficients of the vertices in the graph.
     public static func localClusteringCoefficientDistribution(of graph: SGraph) -> [Double] {
+        
         var localClusteringCoefficients = [Double](repeating: 0.0,
                                                    count: graph.numberOfVertices)
         
@@ -192,13 +193,14 @@ public class SAlgorithms {
          *  Create an array that will help us with small precomputations,
          *  allowing us to save some time with "adjacency" queries.
          */
-        var isNeighbor = [Bool](repeating: false,
+        var isNeighborOfV = [Bool](repeating: false,
                                 count: graph.numberOfVertices)
         
         /**
          *  Iterate all vertices in the graph in order to determine their local clustering coefficients.
          */
-        for v in 0..<graph.numberOfVertices {
+        for v in graph {
+            
             let numberOfNeighbors = graph.edges[v].count
             
             if numberOfNeighbors < 2 {
@@ -223,7 +225,7 @@ public class SAlgorithms {
                  *  they are marked in this array.
                  */
                 for u in graph.edges[v] {
-                    isNeighbor[u] = true
+                    isNeighborOfV[u] = true
                 }
                 
                 /**
@@ -234,7 +236,7 @@ public class SAlgorithms {
                  */
                 for u1 in graph.edges[v] {                  // u1 is a neighbor of v
                     for u2 in graph.edges[u1] {             // u2 is a neighbor of u1
-                        if isNeighbor[u2] {                 // if u2 is also a neighbor of v...
+                        if isNeighborOfV[u2] {              // if u2 is also a neighbor of v...
                             actualEdgesAmongNeighbors += 1  // ... then we have one more edge amongst our neighbors.
                         }
                     }
@@ -249,7 +251,7 @@ public class SAlgorithms {
                  *  processing the next vertex we don't old neighbors marked.
                  */
                 for u in graph.edges[v] {
-                    isNeighbor[u] = false
+                    isNeighborOfV[u] = false
                 }
             }
         }
