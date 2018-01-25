@@ -18,7 +18,7 @@ public class SGraph: Sequence {
     
     /// Internally each vertex is identified using an index.  This dictionary,
     /// maps the nodes label (e.g. the name of the node in a file) to this index.
-    public private(set) var vertexLabels: [Int: String] = [:]
+    public internal(set) var vertexLabels: [Int: String] = [:]
     
     /// The number of nodes in the network.
     public var numberOfVertices: Int {

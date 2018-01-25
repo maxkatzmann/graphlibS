@@ -708,7 +708,8 @@ public class SAlgorithms {
                     /**
                      *  Get the vertices that are contained in this potentially contracted vertex.
                      */
-                    if let containedVertices = currentGraph.vertexAttributes[contractedVertex][SVertexAttribute.containedVertices.rawValue] as? [Int] {
+                    if let containedVertices = currentGraph.vertexAttributeValue(forVertex: contractedVertex,
+                                                                                 withAttributeName: SVertexAttribute.containedVertices.rawValue) as? [Int] {
                         
                         /**
                          *  Assign the new community to all the contained vertices.

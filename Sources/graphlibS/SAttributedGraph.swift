@@ -21,6 +21,7 @@ public enum SEdgeAttribute: String {
 
 public enum SVertexAttribute: String {
     case containedVertices = "SVertexAttribute.containedVertices"
+    case weight = "SVertexAttribute.weight"
 }
 
 public class SAttributedGraph: SGraph {
@@ -29,19 +30,23 @@ public class SAttributedGraph: SGraph {
     
     /// Vertex attributes store values for each vertex.  The dictionary in the
     /// ith position of the array corresponds to the attributes of the ith vertex.
-    /// An attribute is identified by a string.  E.g., node 4 could have a value
-    /// of "4.5" for the attribute "weight".
-    ///             let weight = vertexAttributes[4]["weight"] as double // weight = 4.5
+    /// An attribute is identified by a string.
+    ///
+    /// Use the vertexAttributeValue(forVertex:withAttributeName:) method to access the
+    /// value of a vertex. E.g., node 4 could have a value of "4.5" for the attribute "weight".
+    ///             let weight = vertexAttributeValue(forVertex: 4, withAttributeName: "weight") as double // weight = 4.5
     var vertexAttributes = [[String: Any]]()
     
     /// Edge attributes store values for each edge.  The array in the ith position of
     /// the edgeAttributes array contains an array of dictionaries; one for each
     /// outgoing edge of the ith vertex.  The jth position of the ith array contains
     /// the dictionary containing the attributes of the edge between the ith vertex
-    /// and the jth neighbor of i.  An attribute is identified by a string. E.g.,
-    /// the edge between vertex 4 and its second neighbor (the one at index 1) could
+    /// and the jth neighbor of i.  An attribute is identified by a string.
+    ///
+    /// Use the edgeAttributeValue(forEdgeFrom:to:withAttributeName:) method to access the
+    /// value of an edge. E.g., the edge between vertex 4 and neighbor 1 could
     /// have a value of "2.3" for the attribute "weight".
-    ///             let weight = edgeAttributes[4][1]["weight"] as double // weight = 2.3
+    ///             let weight = graph.edgeAttributeValue(forEdgeFrom: 4, to: 1, withAttributeName: "weight") as double // weight = 2.3
     var edgeAttributes = [[[String: Any]]]()
     
     //MARK: - Initialization
@@ -58,6 +63,23 @@ public class SAttributedGraph: SGraph {
     
     public override init(filePath: String, directed: Bool = false) {
         super.init(filePath: filePath, directed: directed)
+        self.initializeEmptyAttributes()
+    }
+    
+    
+    /// Initializes an SAttributedGraph from an SGraph.
+    ///
+    /// - Parameter graph: The graph that the initialized graph resembles.
+    public init(withGraph graph: SGraph) {
+        super.init(numberOfVertices: graph.numberOfVertices,
+                   directed: graph.directed)
+        
+        self.edges = graph.edges
+        
+        for (vertex, label) in graph.vertexLabels {
+            self.vertexLabels[vertex] = label
+        }
+        
         self.initializeEmptyAttributes()
     }
     
@@ -284,7 +306,8 @@ public class SAttributedGraph: SGraph {
                  *  Get the vertices that are contained in this vertex.
                  *  The current vertex might already contain other vertices.
                  */
-                var containedVerticesToAdd = self.vertexAttributes[vertex][SVertexAttribute.containedVertices.rawValue] as? [Int]
+                var containedVerticesToAdd = self.vertexAttributeValue(forVertex: vertex,
+                                                                       withAttributeName: SVertexAttribute.containedVertices.rawValue) as? [Int]
                 
                 /**
                  *  If the vertex did not contain any other vertices,
@@ -300,14 +323,19 @@ public class SAttributedGraph: SGraph {
                  *  we add our contained vertices.
                  */
                 if let containedVerticesToAdd = containedVerticesToAdd,
-                    let containedVerticesInContractedVertex = contractedGraph.vertexAttributes[contractedVertex][SVertexAttribute.containedVertices.rawValue] as? [Int] {
-                    contractedGraph.vertexAttributes[contractedVertex][SVertexAttribute.containedVertices.rawValue] = containedVerticesInContractedVertex + containedVerticesToAdd
+                    let containedVerticesInContractedVertex = contractedGraph.vertexAttributeValue(forVertex: contractedVertex,
+                                                                                                   withAttributeName: SVertexAttribute.containedVertices.rawValue) as? [Int] {
+                    contractedGraph.setVertexAttributeValue(forVertex: contractedVertex,
+                                                            attributeName: SVertexAttribute.containedVertices.rawValue,
+                                                            value: containedVerticesInContractedVertex + containedVerticesToAdd)
                 } else {
                     /**
                      *  If the contracted vertex did not contain other vertices,
                      *  we set our contained vertices to be its contained vertices.
                      */
-                    contractedGraph.vertexAttributes[contractedVertex][SVertexAttribute.containedVertices.rawValue] = containedVerticesToAdd
+                    contractedGraph.setVertexAttributeValue(forVertex: contractedVertex,
+                                                            attributeName: SVertexAttribute.containedVertices.rawValue,
+                                                            value: containedVerticesToAdd)
                 }
             }
             
@@ -339,6 +367,29 @@ public class SAttributedGraph: SGraph {
         }
     }
     
+    
+    /// Getting the attribute value of a vertex.
+    ///
+    /// - Parameters:
+    ///   - v: The vertex whose attribute value is to be obtained.
+    ///   - attributeName: The name of the attribute whose value is to be obtained.
+    /// - Returns: The value of the attribute for the vertex or nil if it doesn't exist.
+    public func vertexAttributeValue(forVertex v: Int,
+                                     withAttributeName attributeName: String) -> Any? {
+        return self.vertexAttributes[v][attributeName]
+    }
+    
+    /// Setting a vertex attribute value.
+    ///
+    /// - Parameters:
+    ///   - v: The vertex whose attribute is to be set.
+    ///   - attributeName: The name of the attribute whose value is to be set.
+    ///   - value: The value of the attribute for the vertex.
+    public func setVertexAttributeValue(forVertex v: Int,
+                                        attributeName: String,
+                                        value: Any?) {
+        self.vertexAttributes[v][attributeName] = value
+    }
     
     /// Sets a value for a given attribute name for the edge between two vertices,
     /// if the edge exists.
