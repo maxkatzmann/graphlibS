@@ -266,7 +266,7 @@ public class SAlgorithms {
     /// - Complexity: Heuristic approach, no concrete complexity.
     /// - Parameter graph: An undirected(!) graph whose nodes are to be sorted into communities.
     /// - Parameter passThreshold: Determines after how many passes the algorithm should stop. The default value is Int.max so the algorithm stops when the modularity was not improved in the last pass.
-    /// - Returns: A tuple containing an array where the ith position denotes the community of vertex i and a Double representing the achieved modularity. The communites are numbered consecutively starting at 0 and are sorted by decreasing size of the community.
+    /// - Returns: A tuple containing an array where the ith position denotes the community of vertex i and a Double representing the achieved modularity. The communites are numbered consecutively starting at 0 and are sorted by decreasing size of the community. This tuple is nil if the passed graph is not undirected.
     public static func louvainCommunities(of graph: SAttributedGraph,
                                           stoppingAfterPass passThreshold: Int = Int.max) -> ([Int], Double)? {
         

@@ -514,9 +514,21 @@ public class SGraph: Sequence {
             }
             
             /**
-             *  Finally, we assign the neighbors of the vertex in the subgraph.
+             *  Now, we assign the neighbors of the vertex in the subgraph.
              */
             subgraph.edges[v] = neighborsInSubgraph
+            
+            /**
+             *  Finally we copy the labels of the original graph to the labels
+             *  of the subgraph.
+             *
+             *  v is the vertex in the current graph. v_orig is its counterpart
+             *  in the original graph. Therefore, the label of v_orig in the
+             *  original graph now becomes the label of v in the subgraph.
+             */
+            if let vertexLabel = self.vertexLabels[v_orig] {
+                subgraph.vertexLabels[v] = vertexLabel
+            }
         }
         
         return (subgraph, vertexMap)
