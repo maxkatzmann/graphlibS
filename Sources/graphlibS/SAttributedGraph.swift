@@ -22,6 +22,7 @@ public enum SEdgeAttribute: String {
 public enum SVertexAttribute: String {
     case containedVertices = "SVertexAttribute.containedVertices"
     case weight = "SVertexAttribute.weight"
+    case community = "SVertexAttribute.community"
 }
 
 public class SAttributedGraph: SGraph {
@@ -430,5 +431,62 @@ public class SAttributedGraph: SGraph {
         }
         
         return true
+    }
+    
+    //MARK: - Writing
+    
+    /// Creates a string containing the adjacency list of the graph. Each line represents one edge, vertices are seperated by tabs (\t).
+    ///
+    /// - Complexity: O(numberOfEdges)
+    /// - Parameter useLabels:  Determines whether the vertex indices or the labels of the vertices should be used when printing the graph. (Default false, printing the indices.)
+    /// - Returns: A string containing the adjacency list of the graph.
+    override public func toString(useLabels: Bool = true,
+                                  withFormat format: SGraphOutputFormat = .edgeList) -> String {
+        
+        switch format {
+        case .GML:
+            var gml = "graph [\n"
+            
+            gml += "\tdirected \(self.directed ? 1 : 0)\n"
+            
+            for vertex in self {
+                gml += "\tnode [\n"
+                
+                gml += "\t\tid \(vertex)\n"
+                
+                if useLabels,
+                    let vertexLabel = self.vertexLabels[vertex] {
+                    gml += "\t\tlabel \"\(vertexLabel)\"\n"
+                }
+                
+                for (attribute, value) in self.vertexAttributes[vertex] {
+                    gml += "\t\t\(attribute) \(value)\n"
+                }
+                
+                gml += "\t]\n"
+            }
+            
+            for vertex in self {
+                for (neighborIndex, neighbor) in self.edges[vertex].enumerated() {
+                    gml += "\tedge [\n"
+                    
+                    gml += "\t\tsource \(vertex)\n"
+                    gml += "\t\ttarget \(neighbor)\n"
+                    
+                    for (attribute, value) in self.edgeAttributes[vertex][neighborIndex] {
+                        gml += "\t\t\(attribute) \(value)\n"
+                    }
+                    
+                    gml += "]\n"
+                }
+            }
+            
+            gml += "]"
+            
+            return gml
+        default:
+            return super.toString(useLabels: useLabels,
+                                  withFormat: format)
+        }
     }
 }
