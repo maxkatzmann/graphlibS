@@ -8,6 +8,11 @@
 
 import Foundation
 
+public enum SGraphOutputFormat: String {
+    case edgeList = "edgeList"
+    case GML = "GML"
+}
+
 public class SGraph: Sequence {
     
     //MARK: - Properties
@@ -825,24 +830,47 @@ public class SGraph: Sequence {
     /// - Complexity: O(numberOfEdges)
     /// - Parameter useLabels:  Determines whether the vertex indices or the labels of the vertices should be used when printing the graph. (Default false, printing the indices.)
     /// - Returns: A string containing the adjacency list of the graph.
-    public func toString(useLabels: Bool = true) -> String {
-        var adjacencyList = ""
-        if self.directed {
-            for (u, neighbors) in self.edges.enumerated() {
-                for v in neighbors {
-                    if useLabels {
-                        if let u = self.vertexLabels[u], let v = self.vertexLabels[v] {
-                            adjacencyList += "\(u)\t\(v)\n"
-                        }
-                    } else {
-                        adjacencyList += "\(u)\t\(v)\n"
-                    }
+    public func toString(useLabels: Bool = true,
+                         withFormat format: SGraphOutputFormat = .edgeList) -> String {
+        
+        switch format {
+        case .GML:
+            var gml = "graph [\n"
+            
+            gml += "\tdirected \(self.directed ? 1 : 0)\n"
+            
+            for vertex in self {
+                gml += "\tnode [\n"
+                
+                gml += "\t\tid \(vertex)\n"
+                
+                if useLabels,
+                    let vertexLabel = self.vertexLabels[vertex] {
+                    gml += "\t\tlabel \"\(vertexLabel)\"\n"
+                }
+                
+                gml += "\t]\n"
+            }
+            
+            for vertex in self {
+                for neighbor in self.edges[vertex] {
+                    gml += "\tedge [\n"
+                    
+                    gml += "\t\tsource \(vertex)\n"
+                    gml += "\t\ttarget \(neighbor)\n"
+                    
+                    gml += "]\n"
                 }
             }
-        } else {
-            for (u, neighbors) in self.edges.enumerated() {
-                for v in neighbors {
-                    if u <= v {
+            
+            gml += "]"
+            
+            return gml
+        default:
+            var adjacencyList = ""
+            if self.directed {
+                for u in self {
+                    for v in self.edges[u] {
                         if useLabels {
                             if let u = self.vertexLabels[u], let v = self.vertexLabels[v] {
                                 adjacencyList += "\(u)\t\(v)\n"
@@ -852,10 +880,24 @@ public class SGraph: Sequence {
                         }
                     }
                 }
+            } else {
+                for u in self {
+                    for v in self.edges[u] {
+                        if u <= v {
+                            if useLabels {
+                                if let u = self.vertexLabels[u], let v = self.vertexLabels[v] {
+                                    adjacencyList += "\(u)\t\(v)\n"
+                                }
+                            } else {
+                                adjacencyList += "\(u)\t\(v)\n"
+                            }
+                        }
+                    }
+                }
             }
+            
+            return adjacencyList
         }
-        
-        return adjacencyList
     }
     
     
