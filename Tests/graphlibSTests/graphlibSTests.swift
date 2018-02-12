@@ -392,6 +392,12 @@ class graphlibSTests: XCTestCase {
                "The clustering coefficient of vertex 1 should be 1.0, it is \(clusteringCoefficientOfVertex[1]) instead.")
     }
     
+    func testPringGraph() {
+        let graph = SGraph(numberOfVertices: 5, directed: false)
+        graph.addEdge(from: 0, to: 1)
+        print(graph.toString())
+    }
+    
     static var allTests = [
         ("testLargestConnectedComponent", testLargestConnectedComponent),
         ("testConnectedComponents", testConnectedComponents),

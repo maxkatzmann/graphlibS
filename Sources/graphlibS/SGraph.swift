@@ -830,7 +830,7 @@ public class SGraph: Sequence {
     /// - Complexity: O(numberOfEdges)
     /// - Parameter useLabels:  Determines whether the vertex indices or the labels of the vertices should be used when printing the graph. (Default false, printing the indices.)
     /// - Returns: A string containing the adjacency list of the graph.
-    public func toString(useLabels: Bool = true,
+    public func toString(useLabels: Bool = false,
                          withFormat format: SGraphOutputFormat = .edgeList) -> String {
         
         switch format {

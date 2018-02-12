@@ -477,7 +477,7 @@ public class SAttributedGraph: SGraph {
                         gml += "\t\t\(attribute) \(value)\n"
                     }
                     
-                    gml += "]\n"
+                    gml += "\t]\n"
                 }
             }
             
