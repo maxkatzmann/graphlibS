@@ -468,7 +468,45 @@ public class SGraph: Sequence {
         return self.edges[v]
     }
     
-    //MARK: - Subgraph
+    
+    /// Estimated the power-law exponent of the degree distribution of the receiver.
+    /// If beta is the power-law coefficient of a graph then the fraction P(k)
+    /// of nodes in the network that have degree k is is approximately k^(-beta).
+    ///
+    /// - Complexity: O(numberOfNodes)
+    /// - Returns: A Double representing the estimated power-law exponent of the degree distribution of the receiver.
+    public func estimatedPowerLawExponent() -> Double {
+        var exponent = 0.0
+        
+        var degreeDistribution = [Int]()
+        var minDegree = Int.max
+        
+        for vertex in self {
+            let degree = self.degree(of: vertex)
+            degreeDistribution.append(degree)
+            
+            if degree < minDegree {
+                minDegree = degree
+            }
+        }
+        
+        let degreeThreshold = Swift.max(minDegree, 7)
+        
+        var nodesWithDegreeAtLeastThreshold = 0
+        
+        for degree in degreeDistribution {
+            if degree >= degreeThreshold {
+                exponent += log(Double(degree) / (Double(degreeThreshold) - 0.5));
+                nodesWithDegreeAtLeastThreshold += 1
+            }
+        }
+        
+        exponent = 1.0 + Double(nodesWithDegreeAtLeastThreshold) / exponent;
+        
+        return exponent
+    }
+    
+    // MARK: - Subgraph
     
     /// Obtain the subgraph of the receiver induced by the vertices in the passed set.
     ///
@@ -859,7 +897,7 @@ public class SGraph: Sequence {
                     gml += "\t\tsource \(vertex)\n"
                     gml += "\t\ttarget \(neighbor)\n"
                     
-                    gml += "]\n"
+                    gml += "\t]\n"
                 }
             }
             
