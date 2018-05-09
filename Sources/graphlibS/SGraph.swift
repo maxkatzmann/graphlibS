@@ -468,6 +468,7 @@ public class SGraph: Sequence {
         return self.edges[v]
     }
     
+    // MARK: - Properties
     
     /// Estimated the power-law exponent of the degree distribution of the receiver.
     /// If beta is the power-law coefficient of a graph then the fraction P(k)
@@ -504,6 +505,96 @@ public class SGraph: Sequence {
         exponent = 1.0 + Double(nodesWithDegreeAtLeastThreshold) / exponent;
         
         return exponent
+    }
+    
+    
+    /// Determines the diameter of an undirected graph, which is the longest shortest
+    /// path in the graph.
+    ///
+    /// - Note: Not yet implemented for directed graphs.
+    /// - Complexity: O({BFS}) = O(numberOfVertices + numberOfEdges)
+    /// - Returns: The diameter of the graph, or -1 if the graph is directed, or Int.max if the graph is not connected, or Int.min if the graph is empty.
+    public func diameter() -> Int {
+        
+        /**
+         *  The case for a directed graph is not implemented yet.
+         */
+        guard !self.directed else {
+            return -1
+        }
+        
+        /**
+         *  If the graph is empty, the diaemter is -infinity. The diameter is
+         *  the maximum length of all shortest paths. If the graph is empty,
+         *  this is the maximum over an empty set, which is -infinity.
+         */
+        guard self.numberOfVertices > 0 else {
+            return Int.min
+        }
+        
+        /**
+         *  We start at a any vertex v and determine the distance to all other
+         *  vertices, using a breadth first search.
+         */
+        let startVertex = 0
+        var distanceToVertex = [Int](repeating: -1,
+                                     count: self.numberOfVertices)
+        
+        distanceToVertex[startVertex] = 0
+        
+        SAlgorithms.breadthFirstSearch(in: self, startingAt: startVertex) {
+            (vertex, parent) -> (Bool) in
+            
+            distanceToVertex[vertex] = distanceToVertex[parent] + 1
+            return true
+        }
+        
+        /**
+         *  If we have not seen all vertices in the graph, it consists of several
+         *  components and the diameter is thus infinite.
+         */
+        if let minimumDistance = distanceToVertex.min(), minimumDistance < 0 {
+            return Int.max
+        }
+        
+        /**
+         *  Find the vertex, that is farthest from the start vertex.
+         */
+        var farthestVertex = 0
+        var farthestDistance = 0
+        for (vertex, distance) in distanceToVertex.enumerated() {
+            if distance > farthestDistance {
+                farthestDistance = distance
+                farthestVertex = vertex
+            }
+        }
+        
+        /**
+         *  Find the largest distance to any other vertex, from the
+         *  farthestVertex. This is the diameter.
+         */
+        var distanceToFarthest = [Int](repeating: -1, count: self.numberOfVertices)
+        distanceToFarthest[farthestVertex] = 0
+        SAlgorithms.breadthFirstSearch(in: self, startingAt: farthestVertex) {
+            (vertex, parent) -> (Bool) in
+            
+            distanceToFarthest[vertex] = distanceToFarthest[parent] + 1
+            return true
+        }
+        
+        /**
+         *  The diameter is the largest distance a vertex is from the farthest
+         *  vertex.
+         */
+        if let diameter = distanceToFarthest.max() {
+            return diameter
+        } else {
+            /**
+             *  In this case, the graph doesn't have any vertices and the diameter
+             *  is thus 0.
+             */
+            return 0
+        }
     }
     
     // MARK: - Subgraph

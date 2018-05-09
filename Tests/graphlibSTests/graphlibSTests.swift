@@ -3,6 +3,60 @@ import XCTest
 
 class graphlibSTests: XCTestCase {
     
+    func testDiameter() {
+        
+        // Test unconnected graph.
+        
+        /**
+         *  Create a graph with 6 vertices and two components.
+         */
+        let G1 = SGraph(numberOfVertices: 6, directed: false)
+        
+        /**
+         *  One component contains the vertices 0...3
+         */
+        G1.addEdge(from: 0, to: 1)
+        G1.addEdge(from: 0, to: 2)
+        G1.addEdge(from: 1, to: 2)
+        G1.addEdge(from: 2, to: 3)
+        
+        /**
+         *  The second component contains the vertices 4...5
+         */
+        G1.addEdge(from: 4, to: 5)
+        
+        let diameter1 = G1.diameter()
+        XCTAssert(diameter1 == Int.max, "The diameter is \(diameter1), but it should be Int.max.")
+        
+        // Valid diameter
+        
+        /**
+         *  Create a graph with 4 vertices and 1 components.
+         */
+        let G2 = SGraph(numberOfVertices: 4, directed: false)
+        
+        /**
+         *  One component contains the vertices 0...3
+         */
+        G2.addEdge(from: 0, to: 1)
+        G2.addEdge(from: 0, to: 2)
+        G2.addEdge(from: 1, to: 2)
+        G2.addEdge(from: 2, to: 3)
+        
+        let diameter2 = G2.diameter()
+        XCTAssert(diameter2 == 2, "The diameter is \(diameter2), but it should be 2.")
+        
+        // Directed graph
+        let G3 = SGraph(numberOfVertices: 2, directed: true)
+        let diameter3 = G3.diameter()
+        XCTAssert(diameter3 == -1, "The diameter is \(diameter3), but it should be -1.")
+        
+        // Empty Graph
+        let G4 = SGraph(numberOfVertices: 0, directed: false)
+        let diameter4 = G4.diameter()
+        XCTAssert(diameter4 == Int.min, "The diameter is \(diameter4), but it should be Int.min.")
+    }
+    
     func testLargestConnectedComponent() {
         
         /**
@@ -399,6 +453,7 @@ class graphlibSTests: XCTestCase {
     }
     
     static var allTests = [
+        ("testDiameter", testDiameter),
         ("testLargestConnectedComponent", testLargestConnectedComponent),
         ("testConnectedComponents", testConnectedComponents),
         ("testSubgraph", testSubgraph),

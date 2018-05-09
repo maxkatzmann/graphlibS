@@ -1,5 +1,5 @@
 # graphlibS
-[![GitHub tag](https://img.shields.io/badge/Version-0.0.36-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.36)
+[![GitHub tag](https://img.shields.io/badge/Version-0.0.37-brightgreen.svg)](https://github.com/maxkatzmann/graphlibS/releases/tag/0.0.37)
 
 This will (hopefully) become a high performance graph library written in Swift.
 Totally work in progress at the moment. I don't follow a certain schedule
@@ -26,6 +26,10 @@ deleting a vertex that is not actually in the graph will lead to a crash, etc.
 * get the degree of a vertex
 * get the maximum degree of a graph
 * get the average degree of a graph
+
+**Properties**
+* get the diameter of the graph
+* estimate the power-law exponent of the degree distribution of the graph
 
 **Subgraph**
 * get the induced subgraph of a graph containing specified vertices
@@ -69,6 +73,7 @@ here soon.
 ---
 ## License
 GPL-3.0
+
 
 
 

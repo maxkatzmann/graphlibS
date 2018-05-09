@@ -26,7 +26,9 @@ public class SAlgorithms {
     ///   - graph: The graph in which the BFS is to be perfomed.
     ///   - vertex: The vertex where the BFS should start.
     ///   - task: A closure that gets called for each (vertex, parent) that is found during the BFS. The closure returns a boolean value indicating whether this node should be further explored or not.
-    public static func breadthFirstSearch(in graph: SGraph, startingAt v: Int, performingTaskOnSeenVertex task: (Int, Int) -> (Bool)) {
+    public static func breadthFirstSearch(in graph: SGraph,
+                                          startingAt v: Int,
+                                          performingTaskOnSeenVertex task: (Int, Int) -> (Bool)) {
         
         /**
          *  The priority queue will hold all vertices that we have encountered
@@ -93,7 +95,9 @@ public class SAlgorithms {
     ///   - graph: The graph in which the DFS is to be perfomed.
     ///   - vertex: The vertex where the DFS should start.
     ///   - task: A closure that gets called for each (vertex, parent) that is found during the DFS. The closure returns a boolean value indicating whether this node should be further explored or not.
-    public static func depthFirstSearch(in graph: SGraph, startingAt v: Int, performingTaskOnSeenVertex task: (Int, Int) -> (Bool)) {
+    public static func depthFirstSearch(in graph: SGraph,
+                                        startingAt v: Int,
+                                        performingTaskOnSeenVertex task: (Int, Int) -> (Bool)) {
         
         /**
          *  The priority queue will hold all vertices that we have encountered
