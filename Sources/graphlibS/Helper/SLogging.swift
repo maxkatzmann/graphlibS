@@ -3,7 +3,7 @@
 //  graphS
 //
 //  Created by Maximilian Katzmann on 22.08.17.
-//  Copyright © 2017 Maximilian Katzmann. All rights reserved.
+//  Copyright © 2018 Maximilian Katzmann. All rights reserved.
 //
 
 import Foundation
@@ -66,6 +66,8 @@ public class SLogging {
                                   xmax: Double,
                                   ymin: Double,
                                   ymax: Double,
+                                  xIsLog: Bool,
+                                  yIsLog: Bool,
                                   toDirectory directoryPath: String,
                                   withFileName fileName: String,
                                   andStyle style: SLoggingPlotStyle) {
@@ -89,7 +91,15 @@ public class SLogging {
             gnuplotCommand += "e\n" +
             "q\n"
         } else if style == .scatter {
-            gnuplotCommand += "set style circle radius 1.0\n"
+            if xIsLog {
+                gnuplotCommand += "set logscale x\n"
+            }
+            
+            if yIsLog {
+                gnuplotCommand += "set logscale y\n"
+            }
+            
+            gnuplotCommand += "set style circle radius 0.01\n"
             gnuplotCommand += "plot '-' using 1:2 with circles\n"
             for i in 0..<x.count {
                 gnuplotCommand += "\(x[i]) \(y[i])\n"

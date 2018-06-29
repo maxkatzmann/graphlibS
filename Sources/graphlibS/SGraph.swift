@@ -3,7 +3,7 @@
 //  graphS
 //
 //  Created by Maximilian Katzmann on 22.08.17.
-//  Copyright © 2017 Maximilian Katzmann. All rights reserved.
+//  Copyright © 2018 Maximilian Katzmann. All rights reserved.
 //
 
 import Foundation
@@ -25,10 +25,27 @@ public class SGraph: Sequence {
     /// maps the nodes label (e.g. the name of the node in a file) to this index.
     public internal(set) var vertexLabels: [Int: String] = [:]
     
-    /// The number of nodes in the network.
+    /// The number of nodes in the graph.
     public var numberOfVertices: Int {
         get {
             return edges.count
+        }
+    }
+    
+    
+    /// The number of edges in the graph.
+    public var numberOfEdges: Int {
+        get {
+            var edgeSum = 0
+            for edges in self.edges {
+                edgeSum += edges.count
+            }
+            
+            if !self.directed {
+                edgeSum /= 2
+            }
+            
+            return edgeSum
         }
     }
     
@@ -276,6 +293,7 @@ public class SGraph: Sequence {
          *  Removing the vertex and its neighbors.
          */
         self.edges.remove(at: v)
+        self.vertexLabels.removeValue(forKey: v)
         
         /**
          *  Since removing a vertex decreases all the indices of the vertices
@@ -285,7 +303,7 @@ public class SGraph: Sequence {
          *  Since we have to do this anyway, we can remove references to the
          *  deleted vertex in the meantime.
          */
-        for u in 0..<self.edges.count {
+        for u in self {
             
             var vIndex = -1
             for (index, w) in self.edges[u].enumerated() {
@@ -309,6 +327,14 @@ public class SGraph: Sequence {
             
             if vIndex >= 0 {
                 self.edges[u].remove(at: vIndex)
+            }
+            
+            /**
+             *  Since the indices of all vertices with index larger than v changed,
+             *  we need to update the vertexLabels to reflect that change.
+             */
+            if u > v {
+                self.vertexLabels[u - 1] = self.vertexLabels[u]
             }
         }
     }

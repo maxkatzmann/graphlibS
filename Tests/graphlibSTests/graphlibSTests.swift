@@ -3,6 +3,32 @@ import XCTest
 
 class graphlibSTests: XCTestCase {
     
+    func testEdges() {
+        let G1 = SGraph(numberOfVertices: 6, directed: false)
+        /**
+         *  One component contains the vertices 0...3
+         */
+        G1.addEdge(from: 0, to: 1)
+        G1.addEdge(from: 0, to: 2)
+        G1.addEdge(from: 1, to: 2)
+        G1.addEdge(from: 2, to: 3)
+        
+        let numberOfEdgesInG1 = G1.numberOfEdges
+        XCTAssert(numberOfEdgesInG1 == 4, "The number of edges is \(numberOfEdgesInG1), but it should be 4.")
+        
+        let G2 = SGraph(numberOfVertices: 6, directed: true)
+        /**
+         *  One component contains the vertices 0...3
+         */
+        G2.addEdge(from: 0, to: 1)
+        G2.addEdge(from: 0, to: 2)
+        G2.addEdge(from: 1, to: 2)
+        G2.addEdge(from: 2, to: 3)
+        
+        let numberOfEdgesInG2 = G2.numberOfEdges
+        XCTAssert(numberOfEdgesInG2 == 4, "The number of edges is \(numberOfEdgesInG2), but it should be 4.")
+    }
+    
     func testDiameter() {
         
         // Test unconnected graph.
@@ -453,6 +479,7 @@ class graphlibSTests: XCTestCase {
     }
     
     static var allTests = [
+        ("testEdges", testEdges),
         ("testDiameter", testDiameter),
         ("testLargestConnectedComponent", testLargestConnectedComponent),
         ("testConnectedComponents", testConnectedComponents),

@@ -1,0 +1,5 @@
+version: "Apple Swift version 4.2 (swiftlang-1000.0.16.7 clang-1000.10.25.3)"
+options: "c3c0948fb93ee37bfded26a7ebc97728"
+build_time: [1529912179, 147673000]
+inputs:
+  "/Users/mkatzmann/Documents/Development/Github/graphlibS/Package.swift": [1503567198, 0]

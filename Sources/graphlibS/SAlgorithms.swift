@@ -3,7 +3,7 @@
 //  graphS
 //
 //  Created by Maximilian Katzmann on 23.08.17.
-//  Copyright © 2017 Maximilian Katzmann. All rights reserved.
+//  Copyright © 2018 Maximilian Katzmann. All rights reserved.
 //
 
 import Foundation
