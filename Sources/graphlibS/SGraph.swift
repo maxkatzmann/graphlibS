@@ -203,7 +203,7 @@ public class SGraph: Sequence {
                  *  whitespaces or tabs.
                  */
                 let lineComponents = line.components(separatedBy: CharacterSet.whitespaces)
-                if lineComponents.count != 2 {
+                if lineComponents.count < 2 {
                     SLogging.error(message: "There was a line that did not consist of a vertex pair.")
                 } else {
                     /**
@@ -285,7 +285,7 @@ public class SGraph: Sequence {
     
     /// Removes the vertex from the graph.
     ///
-    /// - Complexity: O(numberOfEdges).
+    /// - Complexity: O(numberOfNodes * numberOfEdges).
     /// - Parameter v: The index of the vertex to be removed
     public func removeVertex(_ v: Int) {
         
