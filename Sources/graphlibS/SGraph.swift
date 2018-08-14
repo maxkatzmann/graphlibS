@@ -1025,9 +1025,9 @@ public class SGraph: Sequence {
             
             return result
         case .DL:
-            result = "dl n=\(self.numberOfVertices)\n"
+            result = "DL n=\(self.numberOfVertices)\n"
             result += "format = edgelist1\n"
-            result += "labels = embedded:\n"
+            result += "labels embedded:\n"
             result += "data:\n"
             
             /**
