@@ -3,6 +3,14 @@ import XCTest
 
 class graphlibSTests: XCTestCase {
     
+    func testGraphInitialization() {
+        let G = SGraph(filePath: "/Users/mkatzmann/Documents/Development/Repos/HPICode/grohegcli/new_experiments/experiments.nosync/inf-euroroad/inf-euroroad.txt")
+        let (component, _) = G.largestConnectedComponent()
+        print("Number of nodes: \(G.numberOfVertices)")
+        print("Component: \(component.numberOfVertices)")
+        print(component.toString(useLabels: false, withFormat: SGraphOutputFormat.edgeList))
+    }
+    
     func testEdges() {
         let G1 = SGraph(numberOfVertices: 6, directed: false)
         /**
@@ -475,7 +483,20 @@ class graphlibSTests: XCTestCase {
     func testPringGraph() {
         let graph = SGraph(numberOfVertices: 5, directed: false)
         graph.addEdge(from: 0, to: 1)
-        print(graph.toString())
+        graph.addEdge(from: 1, to: 2)
+        graph.addEdge(from: 1, to: 3)
+        graph.addEdge(from: 2, to: 4)
+        graph.addEdge(from: 4, to: 3)
+        
+        
+        print("Edgelist:")
+        print(graph.toString(useLabels: true, withFormat: .edgeList))
+        
+        print("GML:")
+        print(graph.toString(useLabels: true, withFormat: .GML))
+        
+        print("DL:")
+        print(graph.toString(useLabels: true, withFormat: .DL))
     }
     
     static var allTests = [

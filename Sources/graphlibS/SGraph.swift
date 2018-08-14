@@ -11,6 +11,7 @@ import Foundation
 public enum SGraphOutputFormat: String {
     case edgeList = "edgeList"
     case GML = "GML"
+    case DL = "DL"
 }
 
 public class SGraph: Sequence {
@@ -988,50 +989,64 @@ public class SGraph: Sequence {
     public func toString(useLabels: Bool = false,
                          withFormat format: SGraphOutputFormat = .edgeList) -> String {
         
+        var result = ""
+        
         switch format {
         case .GML:
-            var gml = "graph [\n"
+            result = "graph [\n"
             
-            gml += "\tdirected \(self.directed ? 1 : 0)\n"
+            result += "\tdirected \(self.directed ? 1 : 0)\n"
             
             for vertex in self {
-                gml += "\tnode [\n"
+                result += "\tnode [\n"
                 
-                gml += "\t\tid \(vertex)\n"
+                result += "\t\tid \(vertex)\n"
                 
                 if useLabels,
                     let vertexLabel = self.vertexLabels[vertex] {
-                    gml += "\t\tlabel \"\(vertexLabel)\"\n"
+                    result += "\t\tlabel \"\(vertexLabel)\"\n"
                 }
                 
-                gml += "\t]\n"
+                result += "\t]\n"
             }
             
             for vertex in self {
                 for neighbor in self.edges[vertex] {
-                    gml += "\tedge [\n"
+                    result += "\tedge [\n"
                     
-                    gml += "\t\tsource \(vertex)\n"
-                    gml += "\t\ttarget \(neighbor)\n"
+                    result += "\t\tsource \(vertex)\n"
+                    result += "\t\ttarget \(neighbor)\n"
                     
-                    gml += "\t]\n"
+                    result += "\t]\n"
                 }
             }
             
-            gml += "]"
+            result += "]"
             
-            return gml
+            return result
+        case .DL:
+            result = "dl n=\(self.numberOfVertices)\n"
+            result += "format = edgelist1\n"
+            result += "labels = embedded:\n"
+            result += "data:\n"
+            
+            /**
+             *  From now on the DL format is the same as a simple edge list
+             *  therefore we can simply fall through to creating the normal edge
+             *  list.
+             */
+            fallthrough
         default:
-            var adjacencyList = ""
+            
             if self.directed {
                 for u in self {
                     for v in self.edges[u] {
-                        if useLabels {
-                            if let u = self.vertexLabels[u], let v = self.vertexLabels[v] {
-                                adjacencyList += "\(u)\t\(v)\n"
-                            }
+                        if useLabels,
+                            let u = self.vertexLabels[u],
+                            let v = self.vertexLabels[v] {
+                            result += "\(u)\t\(v)\n"
                         } else {
-                            adjacencyList += "\(u)\t\(v)\n"
+                            result += "\(u)\t\(v)\n"
                         }
                     }
                 }
@@ -1039,19 +1054,19 @@ public class SGraph: Sequence {
                 for u in self {
                     for v in self.edges[u] {
                         if u <= v {
-                            if useLabels {
-                                if let u = self.vertexLabels[u], let v = self.vertexLabels[v] {
-                                    adjacencyList += "\(u)\t\(v)\n"
-                                }
+                            if useLabels,
+                                let u = self.vertexLabels[u],
+                                let v = self.vertexLabels[v] {
+                                result += "\(u)\t\(v)\n"
                             } else {
-                                adjacencyList += "\(u)\t\(v)\n"
+                                result += "\(u)\t\(v)\n"
                             }
                         }
                     }
                 }
             }
             
-            return adjacencyList
+            return result
         }
     }
     
