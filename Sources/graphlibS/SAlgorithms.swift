@@ -16,7 +16,7 @@ public enum SVertexState: Int {
 
 public class SAlgorithms {
     
-    //MARK: - Search
+    // MARK: - Search
     
     /// Performs a Breadth First Search in the graph starting at a given vertex
     /// and executes a task for each vertex found.
@@ -179,7 +179,7 @@ public class SAlgorithms {
         }
     }
     
-    //MARK: - Clustering
+    // MARK: - Clustering
     
     /// Determines the local clustering coefficients for all vertices in the graph
     /// and returns them in an array. The local clustering coefficient of vertex
@@ -263,7 +263,7 @@ public class SAlgorithms {
         return localClusteringCoefficients
     }
     
-    //MARK: - Community Detection
+    // MARK: - Community Detection
     
     /// Determines the communities in the graph using the Louvain algorithm.
     ///

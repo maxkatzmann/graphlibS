@@ -3,14 +3,6 @@ import XCTest
 
 class graphlibSTests: XCTestCase {
     
-    func testGraphInitialization() {
-        let G = SGraph(filePath: "/Users/mkatzmann/Documents/Development/Repos/HPICode/grohegcli/new_experiments/experiments.nosync/inf-euroroad/inf-euroroad.txt")
-        let (component, _) = G.largestConnectedComponent()
-        print("Number of nodes: \(G.numberOfVertices)")
-        print("Component: \(component.numberOfVertices)")
-        print(component.toString(useLabels: false, withFormat: SGraphOutputFormat.edgeList))
-    }
-    
     func testEdges() {
         let G1 = SGraph(numberOfVertices: 6, directed: false)
         /**
@@ -277,6 +269,139 @@ class graphlibSTests: XCTestCase {
                   "The degree of vertex 4 was \(subgraph.degree(of: vertexMap[4]!)) instead of 0!")
     }
     
+    func testAttributedSubgraph() {
+        /**
+         *  Create a graph with 6 vertices and two components.
+         */
+        let G = SAttributedGraph(numberOfVertices: 6, directed: false)
+        
+        /**
+         *  One component contains the vertices 0...3
+         */
+        G.addEdge(from: 0, to: 1)
+        G.addEdge(from: 0, to: 2)
+        G.addEdge(from: 1, to: 2)
+        G.addEdge(from: 2, to: 3)
+        
+        /**
+         *  The second component contains the vertices 4...5
+         */
+        G.addEdge(from: 4, to: 5)
+        
+        /**
+         *  Add attributes
+         */
+        for vertex in G {
+            G.setVertexAttributeValue(forVertex: vertex,
+                                      attributeName: SVertexAttribute.label.rawValue, value: "\(vertex)")
+        }
+        
+        G.setVertexAttributeValue(forVertex: 4,
+                                  attributeName: SVertexAttribute.weight.rawValue,
+                                  value: 5)
+        
+        G.setEdgeAttributeValue(forEdgeFrom: 0,
+                                to: 2,
+                                attributeName: SEdgeAttribute.weight.rawValue,
+                                value: 7)
+        G.setEdgeAttributeValue(forEdgeFrom: 4,
+                                to: 5,
+                                attributeName: SEdgeAttribute.weight.rawValue,
+                                value: 9)
+        
+        /**
+         *  We want our subgraph to contain the vertice 0, 1, 2 and 4
+         */
+        let verticesInSubgraph = [0, 1, 2, 4]
+        
+        let (subgraph, vertexMap) = G.subgraph(containing: verticesInSubgraph)
+        
+        /**
+         *  Check whether the subgraph contains 4 verices.
+         */
+        XCTAssert(subgraph.numberOfVertices == 4,
+                  "The subgraph contained \(subgraph.numberOfVertices) vertices instead of 4!")
+        
+        /**
+         *  Check whether the adjacency properties of the subgraph are correct.
+         */
+        
+        // 0 and 1 should be adjacent.
+        XCTAssert(subgraph.adjacent(u: vertexMap[0]!, v: vertexMap[1]!),
+                  "The counterparts of 0 and 1 were not adjacent in the subgraph!")
+        
+        // 1 and 0 should be adjacent.
+        XCTAssert(subgraph.adjacent(u: vertexMap[1]!, v: vertexMap[0]!),
+                  "The counterparts of 1 and 0 were not adjacent in the subgraph!")
+        
+        // 0 and 2 should be adjacent.
+        XCTAssert(subgraph.adjacent(u: vertexMap[0]!, v: vertexMap[2]!),
+                  "The counterparts of 0 and 2 were not adjacent in the subgraph!")
+        
+        // 2 and 0 should be adjacent.
+        XCTAssert(subgraph.adjacent(u: vertexMap[2]!, v: vertexMap[0]!),
+                  "The counterparts of 2 and 0 were not adjacent in the subgraph!")
+        
+        // 1 and 2 should be adjacent.
+        XCTAssert(subgraph.adjacent(u: vertexMap[1]!, v: vertexMap[2]!),
+                  "The counterparts of 1 and 2 were not adjacent in the subgraph!")
+        
+        // 2 and 1 should be adjacent.
+        XCTAssert(subgraph.adjacent(u: vertexMap[2]!, v: vertexMap[1]!),
+                  "The counterparts of 2 and 1 were not adjacent in the subgraph!")
+        
+        /**
+         *  The counterpart of 4 should not have any neighbors. Therefore, its degree should be 0.
+         */
+        XCTAssert(subgraph.degree(of: vertexMap[4]!) == 0,
+                  "The degree of vertex 4 was \(subgraph.degree(of: vertexMap[4]!)) instead of 0!")
+        
+        /**
+         *  Check if the edge attributes were copied correctly.
+         */
+        for originalVertex in verticesInSubgraph {
+            if let vertexInSubgraph = vertexMap[originalVertex] {
+                if let label = subgraph.vertexAttributeValue(forVertex: vertexInSubgraph,
+                                                             withAttributeName: SVertexAttribute.label.rawValue) as? String {
+                    XCTAssert(label == "\(originalVertex)",
+                        "The label of vertex \(originalVertex) was not transferred to the subgraph correctly.")
+                } else {
+                    XCTAssert(false,
+                              "Vertex \(originalVertex) did not have the label attribute in the subgraph!")
+                }
+            } else {
+                XCTAssert(false,
+                          "Vertex \(originalVertex) did not have a counterpart in the subgraph!")
+            }
+        }
+        
+        if let counterpartOf0 = vertexMap[0],
+            let counterpartOf2 = vertexMap[2] {
+            if let weight = subgraph.edgeAttributeValue(forEdgeFrom: counterpartOf0,
+                                                        to: counterpartOf2,
+                                                        withAttributeName: SEdgeAttribute.weight.rawValue) as? Int {
+                
+                XCTAssert(weight == 7,
+                          "The weight of the edge between 0 and 2 changed in the subgraph from 7 to \(weight)")
+                
+            } else {
+                XCTAssert(false,
+                          "The attribute of the edge between 0 and 2 was not transferred to the subgraph correctly!")
+            }
+        } else {
+            XCTAssert(false,
+                      "At least one of the vertices 0, 2 did not have a counterpart in the subgraph!")
+        }
+        
+        if let counterpartOf4 = vertexMap[4] {
+            XCTAssert(subgraph.edgeAttributes[counterpartOf4].count == 0,
+                      "The counterpart of 4 should not have edge attributes in the subgraph. However, it had \(subgraph.edgeAttributes[counterpartOf4].count)")
+        } else {
+            XCTAssert(false,
+                      "Vertex 4 did not have a counterpart in the subgraph!")
+        }
+    }
+    
     func testDFS() {
         /**
          *  Create a graph with 6 vertices and two components.
@@ -505,8 +630,10 @@ class graphlibSTests: XCTestCase {
         ("testLargestConnectedComponent", testLargestConnectedComponent),
         ("testConnectedComponents", testConnectedComponents),
         ("testSubgraph", testSubgraph),
+        ("testAttributedSubgraph", testAttributedSubgraph),
         ("testDFS", testDFS),
         ("testContraction", testContraction),
-        ("testLouvainCommunityDetection", testLouvainCommunityDetection)
+        ("testLouvainCommunityDetection", testLouvainCommunityDetection),
+        ("testClusteringCoefficients", testClusteringCoefficients)
     ]
 }

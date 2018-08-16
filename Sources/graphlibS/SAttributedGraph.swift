@@ -7,7 +7,7 @@
 
 import Foundation
 
-//MARK: - Common Attributes
+// MARK: - Common Attributes
 
 
 /// These enums stores names of commonly used attributes, which simplifies things,
@@ -24,11 +24,12 @@ public enum SVertexAttribute: String {
     case weight = "SVertexAttribute.weight"
     case community = "SVertexAttribute.community"
     case coordinate = "SVertexAttribute.coordinate"
+    case label = "SVertexAttribute.label"
 }
 
 public class SAttributedGraph: SGraph {
     
-    //MARK: - Properties
+    // MARK: - Properties
     
     /// Vertex attributes store values for each vertex.  The dictionary in the
     /// ith position of the array corresponds to the attributes of the ith vertex.
@@ -51,7 +52,7 @@ public class SAttributedGraph: SGraph {
     ///             let weight = graph.edgeAttributeValue(forEdgeFrom: 4, to: 1, withAttributeName: "weight") as double // weight = 2.3
     var edgeAttributes = [[[String: Any]]]()
     
-    //MARK: - Initialization
+    // MARK: - Initialization
     
     public override init(numberOfVertices: Int, directed: Bool = false) {
         super.init(numberOfVertices: numberOfVertices, directed: directed)
@@ -93,6 +94,15 @@ public class SAttributedGraph: SGraph {
                                       count: self.numberOfVertices)
         
         /**
+         *  We set the 'label' vertex attribute of the vertices to their labels.
+         */
+        for (vertex, label) in self.vertexLabels {
+            self.setVertexAttributeValue(forVertex: vertex,
+                                         attributeName: SVertexAttribute.label.rawValue,
+                                         value: label)
+        }
+        
+        /**
          *  Initialize empty edge attributes.
          */
         for edges in self.edges {
@@ -102,7 +112,7 @@ public class SAttributedGraph: SGraph {
         }
     }
     
-    //MARK: - Vertices and Edges
+    // MARK: - Vertices and Edges
     
     /// Add a vertex to the graph.
     ///
@@ -234,7 +244,58 @@ public class SAttributedGraph: SGraph {
         return removedSuccessful
     }
     
-    //MARK: - Contraction
+    // MARK: - Subgraph
+    
+    public override func subgraph(containing vertices: [Int]) -> (SAttributedGraph, [Int : Int]) {
+        
+        /**
+         *  Vertex labels are also stored transferred in the original subgraph
+         *  therefore we don't need to transfer them manually.
+         *  However we have to set the vertex labels as attributes on the
+         *  attributedSubgraph which is done automatically in the initializer.
+         */
+        let (subgraph, vertexMap) = super.subgraph(containing: vertices)
+        let attributedSubgraph = SAttributedGraph(withGraph: subgraph)
+        
+        /**
+         *  Now we transfer the remaining attribute values.
+         */
+        for vertex in vertices {
+            if let vertexCounterpartInSubgraph = vertexMap[vertex] {
+                attributedSubgraph.vertexAttributes[vertexCounterpartInSubgraph] = self.vertexAttributes[vertex]
+                
+                /**
+                 *  Copy the edge attribtues.
+                 */
+                let neighbors = self.neighborsOf(vertex)
+                for neighborIndex in 0..<neighbors.count {
+                    
+                    /**
+                     *  Check if the neighbor is also in the subgraph.
+                     */
+                    if let neighborCounterPartInSubgraph = vertexMap[neighbors[neighborIndex]] {
+                        
+                        /**
+                         *  If the vertex and the neighbor in the subgraph,
+                         *  then there has to be an edge between them.
+                         *  (They were neighbors in the original graph so they
+                         *  have to be neighbors in the subgraph.)
+                         */
+                        for (attributeName, attributeValue) in self.edgeAttributes[vertex][neighborIndex] {
+                            attributedSubgraph.setEdgeAttributeValue(forEdgeFrom: vertexCounterpartInSubgraph,
+                                                                     to: neighborCounterPartInSubgraph,
+                                                                     attributeName: attributeName,
+                                                                     value: attributeValue)
+                        }
+                    }
+                }
+            }
+        }
+        
+        return (attributedSubgraph, vertexMap)
+    }
+    
+    // MARK: - Contraction
     
     /// Contracts a graph using the vertex assignments in the passed contractions
     /// array.  That is, the integers in the contractions array go from 0 to
@@ -348,7 +409,7 @@ public class SAttributedGraph: SGraph {
         }
     }
     
-    //MARK: - Attributes
+    // MARK: - Attributes
     
     
     /// Determines the attribute value for the edge between two vertices, if it exists.
@@ -434,7 +495,7 @@ public class SAttributedGraph: SGraph {
         return true
     }
     
-    //MARK: - Writing
+    // MARK: - Writing
     
     /// Creates a string containing the adjacency list of the graph. Each line represents one edge, vertices are seperated by tabs (\t).
     ///

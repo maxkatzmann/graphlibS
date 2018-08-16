@@ -16,7 +16,7 @@ public enum SGraphOutputFormat: String {
 
 public class SGraph: Sequence {
     
-    //MARK: - Properties
+    // MARK: - Properties
     
     /// The edges of the graph.  Array at the ith position contains the indices
     /// of the neighbors of the ith node.
@@ -53,7 +53,7 @@ public class SGraph: Sequence {
     /// A Bool indicating whether the graph is directed or not.
     public let directed: Bool
     
-    //MARK: - Initiazlization
+    // MARK: - Initiazlization
     
     /// Default initializer that creates a graph containing the specified
     /// number of isolated vertices.
@@ -259,7 +259,7 @@ public class SGraph: Sequence {
         }
     }
     
-    //MARK: - Sequence Protocol
+    // MARK: - Sequence Protocol
     
     
     /// This allows us to iterate the vertices of the graph as
@@ -272,7 +272,7 @@ public class SGraph: Sequence {
         return (0..<self.numberOfVertices).makeIterator()
     }
     
-    //MARK: - Vertices and Edges
+    // MARK: - Vertices and Edges
     
     /// Add a vertex to the graph.
     ///
@@ -425,7 +425,7 @@ public class SGraph: Sequence {
         return removedSuccessful
     }
     
-    //MARK: - Adjacency
+    // MARK: - Adjacency
     
     /// Determines whether to vertices are connected by an edge, or not.
     ///
@@ -695,7 +695,7 @@ public class SGraph: Sequence {
         return (subgraph, vertexMap)
     }
     
-    //MARK: - Connected Components
+    // MARK: - Connected Components
     
     /// Determines the vertex set representing the connected component that
     /// contains the passed vertex v.
@@ -919,7 +919,7 @@ public class SGraph: Sequence {
         return components
     }
     
-    //MARK: - Contraction
+    // MARK: - Contraction
     
     
     /// Contracts a graph using the vertex assignments in the passed contractions
@@ -979,7 +979,7 @@ public class SGraph: Sequence {
         }
     }
     
-    //MARK: - Writing
+    // MARK: - Writing
     
     /// Creates a string containing the adjacency list of the graph. Each line represents one edge, vertices are seperated by tabs (\t).
     ///
