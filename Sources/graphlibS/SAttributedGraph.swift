@@ -23,6 +23,7 @@ public enum SVertexAttribute: String {
     case containedVertices = "SVertexAttribute.containedVertices"
     case weight = "SVertexAttribute.weight"
     case community = "SVertexAttribute.community"
+    case coordinate = "SVertexAttribute.coordinate"
 }
 
 public class SAttributedGraph: SGraph {
