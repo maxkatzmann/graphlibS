@@ -70,6 +70,92 @@ public class SGraph: Sequence {
     }
     
     
+    /// Extracts the edge information from a string and adds the corresponding
+    /// edgeto the graph. This is a helper method that unifies the behavior of
+    /// reading a graph from a file or an edge list string.
+    ///
+    /// - Parameters:
+    ///   - str: A string describing the edge that should be added.
+    ///   - indexMap: A map from strings to indices that is used to keep track of which vertices have already been indexed.
+    /// - Returns: A Bool value indicating whether the edge was added successful or not.
+    private func addEdge(from str: String,
+                         withIndexMap indexMap: inout [String: Int]) -> Bool {
+        /**
+         *  When the string is empty, we simply ignore it. Additionally,
+         *  we ignore string that are actually comments.
+         */
+        if !str.isEmpty
+            && str[str.startIndex] != "#"
+            && str[str.startIndex] != "%" {
+            
+            /**
+             *  Each string should contain two components seperated by
+             *  whitespaces or tabs.
+             */
+            let stringComponents = str.components(separatedBy: CharacterSet.whitespaces)
+            if stringComponents.count != 2 {
+                SLogging.error(message: "There was a string that did not consist of a vertex pair.")
+            } else {
+                /**
+                 *  Get the index for the first vertex
+                 */
+                let label1 = stringComponents[0]
+                var index1 = indexMap[label1]
+                if index1 == nil {
+                    /**
+                     *  If the vertex does not have an index yet, it will get
+                     *  the next available index.
+                     */
+                    index1 = self.edges.count
+                    indexMap[label1] = index1!
+                    
+                    /**
+                     *  Make sure we later know which vertex belongs to which
+                     *  index and afterwards reserve the neighbor array for
+                     */
+                    self.vertexLabels[index1!] = label1
+                    self.edges.append([])
+                }
+                
+                /**
+                 *  Get the index for the second vertex
+                 */
+                let label2 = stringComponents[1]
+                var index2 = indexMap[label2]
+                if index2 == nil {
+                    /**
+                     *  If the vertex does not have an index yet, it will get
+                     *  the next available index.
+                     */
+                    index2 = self.edges.count
+                    indexMap[label2] = index2!
+                    
+                    /**
+                     *  Make sure we later know which vertex belongs to which
+                     *  index and afterwards reserve the neighbor array for
+                     */
+                    self.vertexLabels[index2!] = label2
+                    self.edges.append([])
+                }
+                
+                self.edges[index1!].append(index2!)
+                if !directed {
+                    self.edges[index2!].append(index1!)
+                }
+                
+                /**
+                 *  A new edge was added successfully.
+                 */
+                return true
+            }
+        }
+        
+        /**
+         *  We did not add the edge.
+         */
+        return false
+    }
+    
     /// Initializer that generates a graph from an edge list stored in a string.
     /// - Note: When reading an edge list from a file, use the init(filePath:directed:) method for increased performance.
     ///
@@ -83,78 +169,19 @@ public class SGraph: Sequence {
          *  Auxiliary dictionary to quickly recognize whether a vertex
          *  was assigned an index already.
          */
-        var indexForVertexLabel: [String: Int] = [:]
+        var indexMap: [String: Int] = [:]
         var numberOfEdges = 0
         
         edgeList.enumerateLines {
             (line: String, stop: inout Bool) in
             
-            /**
-             *  When the line is empty, we simply ignore it. Additionally,
-             *  we skip lines that are actually comments.
-             */
-            if !line.isEmpty
-                && line[line.startIndex] != "#"
-                && line[line.startIndex] != "%" {
-                
-                /**
-                 *  Each line should contain two strings seperated by
-                 *  whitespaces or tabs.
-                 */
-                let lineComponents = line.components(separatedBy: CharacterSet.whitespaces)
-                if lineComponents.count != 2 {
-                    SLogging.error(message: "There was a line that did not consist of a vertex pair.")
-                } else {
-                    /**
-                     *  Get the index for the first vertex
-                     */
-                    let label1 = lineComponents[0]
-                    var index1 = indexForVertexLabel[label1]
-                    if index1 == nil {
-                        /**
-                         *  If the vertex does not have an index yet, it will get
-                         *  the next available index.
-                         */
-                        index1 = self.edges.count
-                        indexForVertexLabel[label1] = index1!
-                        
-                        /**
-                         *  Make sure we later know which vertex belongs to which
-                         *  index and afterwards reserve the neighbor array for
-                         */
-                        self.vertexLabels[index1!] = label1
-                        self.edges.append([])
-                    }
-                    
-                    /**
-                     *  Get the index for the second vertex
-                     */
-                    let label2 = lineComponents[1]
-                    var index2 = indexForVertexLabel[label2]
-                    if index2 == nil {
-                        /**
-                         *  If the vertex does not have an index yet, it will get
-                         *  the next available index.
-                         */
-                        index2 = self.edges.count
-                        indexForVertexLabel[label2] = index2!
-                        
-                        /**
-                         *  Make sure we later know which vertex belongs to which
-                         *  index and afterwards reserve the neighbor array for
-                         */
-                        self.vertexLabels[index2!] = label2
-                        self.edges.append([])
-                    }
-                    
-                    self.edges[index1!].append(index2!)
-                    if !directed {
-                        self.edges[index2!].append(index1!)
-                    }
-                    numberOfEdges += 1
-                }
+            if self.addEdge(from: line, withIndexMap: &indexMap) {
+                numberOfEdges += 1
             }
             
+            /**
+             *  We don't stop until we reached the end of the line.
+             */
             stop = false
         }
     }
@@ -176,7 +203,7 @@ public class SGraph: Sequence {
              *  Auxiliary dictionary to quickly recognize whether a vertex
              *  was assigned an index already.
              */
-            var indexForVertexLabel: [String: Int] = [:]
+            var indexMap: [String: Int] = [:]
             var numberOfEdges = 0
             
             /**
@@ -184,75 +211,7 @@ public class SGraph: Sequence {
              */
             while let line = inputStreamReader.nextLine() {
                 
-                /**
-                 *  When the line is empty, we simply ignore it.
-                 */
-                guard !line.isEmpty else {
-                    continue
-                }
-                
-                /**
-                 *  Skip lines that are actually comments.
-                 */
-                if line[line.startIndex] == "#" ||
-                    line[line.startIndex] == "%" {
-                    continue
-                }
-                
-                /**
-                 *  Each line should contain two strings seperated by
-                 *  whitespaces or tabs.
-                 */
-                let lineComponents = line.components(separatedBy: CharacterSet.whitespaces)
-                if lineComponents.count < 2 {
-                    SLogging.error(message: "There was a line that did not consist of a vertex pair.")
-                } else {
-                    /**
-                     *  Get the index for the first vertex
-                     */
-                    let label1 = lineComponents[0]
-                    var index1 = indexForVertexLabel[label1]
-                    if index1 == nil {
-                        /**
-                         *  If the vertex does not have an index yet, it will get
-                         *  the next available index.
-                         */
-                        index1 = edges.count
-                        indexForVertexLabel[label1] = index1!
-                        
-                        /**
-                         *  Make sure we later know which vertex belongs to which
-                         *  index and afterwards reserve the neighbor array for
-                         */
-                        vertexLabels[index1!] = label1
-                        edges.append([])
-                    }
-                    
-                    /**
-                     *  Get the index for the second vertex
-                     */
-                    let label2 = lineComponents[1]
-                    var index2 = indexForVertexLabel[label2]
-                    if index2 == nil {
-                        /**
-                         *  If the vertex does not have an index yet, it will get
-                         *  the next available index.
-                         */
-                        index2 = edges.count
-                        indexForVertexLabel[label2] = index2!
-                        
-                        /**
-                         *  Make sure we later know which vertex belongs to which
-                         *  index and afterwards reserve the neighbor array for
-                         */
-                        vertexLabels[index2!] = label2
-                        edges.append([])
-                    }
-                    
-                    edges[index1!].append(index2!)
-                    if !directed {
-                        edges[index2!].append(index1!)
-                    }
+                if self.addEdge(from: line, withIndexMap: &indexMap) {
                     numberOfEdges += 1
                 }
             }
