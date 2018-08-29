@@ -69,7 +69,6 @@ public class SGraph: Sequence {
         }
     }
     
-    
     /// Extracts the edge information from a string and adds the corresponding
     /// edgeto the graph. This is a helper method that unifies the behavior of
     /// reading a graph from a file or an edge list string.
@@ -523,6 +522,13 @@ public class SGraph: Sequence {
          *  vertices, using a breadth first search.
          */
         let startVertex = 0
+        
+        /**
+         *  We later need the vertex that is farthest from the start vertex.
+         */
+        var farthestVertex = startVertex
+        var farthestDistance = 0
+        
         var distanceToVertex = [Int](repeating: -1,
                                      count: self.numberOfVertices)
         
@@ -532,6 +538,12 @@ public class SGraph: Sequence {
             (vertex, parent) -> (Bool) in
             
             distanceToVertex[vertex] = distanceToVertex[parent] + 1
+            
+            if distanceToVertex[vertex] > farthestDistance {
+                farthestVertex = vertex
+                farthestDistance = distanceToVertex[vertex]
+            }
+            
             return true
         }
         
@@ -544,27 +556,21 @@ public class SGraph: Sequence {
         }
         
         /**
-         *  Find the vertex, that is farthest from the start vertex.
-         */
-        var farthestVertex = 0
-        var farthestDistance = 0
-        for (vertex, distance) in distanceToVertex.enumerated() {
-            if distance > farthestDistance {
-                farthestDistance = distance
-                farthestVertex = vertex
-            }
-        }
-        
-        /**
          *  Find the largest distance to any other vertex, from the
          *  farthestVertex. This is the diameter.
          */
         var distanceToFarthest = [Int](repeating: -1, count: self.numberOfVertices)
         distanceToFarthest[farthestVertex] = 0
+        var maximumDistance = 0
         SAlgorithms.breadthFirstSearch(in: self, startingAt: farthestVertex) {
             (vertex, parent) -> (Bool) in
             
             distanceToFarthest[vertex] = distanceToFarthest[parent] + 1
+            
+            if distanceToFarthest[vertex] > maximumDistance {
+                maximumDistance = distanceToFarthest[vertex]
+            }
+            
             return true
         }
         
@@ -572,15 +578,7 @@ public class SGraph: Sequence {
          *  The diameter is the largest distance a vertex is from the farthest
          *  vertex.
          */
-        if let diameter = distanceToFarthest.max() {
-            return diameter
-        } else {
-            /**
-             *  In this case, the graph doesn't have any vertices and the diameter
-             *  is thus 0.
-             */
-            return 0
-        }
+        return maximumDistance
     }
     
     // MARK: - Subgraph

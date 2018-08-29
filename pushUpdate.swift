@@ -19,7 +19,9 @@ func shell(arguments: [String]) -> String
 }
 
 if CommandLine.arguments.count > 1 {
+
     let currentVersionString = shell(arguments: ["git", "describe", "--tags"]).trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+
     print("Current Version is: \(currentVersionString)")
 
     var versionComponents = currentVersionString.components(separatedBy: ".")

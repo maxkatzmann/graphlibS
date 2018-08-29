@@ -83,6 +83,14 @@ public class SLogging {
             "set yrange [\(ymin):\(ymax)]\n" +
             "set output \"\(fileName)\"\n"
         
+        if xIsLog {
+            gnuplotCommand += "set logscale x\n"
+        }
+        
+        if yIsLog {
+            gnuplotCommand += "set logscale y\n"
+        }
+
         if style == .line {
             gnuplotCommand += "plot '-' using 1:2 with lines\n"
             for i in 0..<x.count {
@@ -91,13 +99,6 @@ public class SLogging {
             gnuplotCommand += "e\n" +
             "q\n"
         } else if style == .scatter {
-            if xIsLog {
-                gnuplotCommand += "set logscale x\n"
-            }
-            
-            if yIsLog {
-                gnuplotCommand += "set logscale y\n"
-            }
             
             gnuplotCommand += "set style circle radius 0.01\n"
             gnuplotCommand += "plot '-' using 1:2 with circles\n"
