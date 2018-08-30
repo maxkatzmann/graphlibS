@@ -76,7 +76,7 @@ public class SGraph: Sequence {
     /// - Parameters:
     ///   - str: A string describing the edge that should be added.
     ///   - indexMap: A map from strings to indices that is used to keep track of which vertices have already been indexed.
-    /// - Returns: A Bool value indicating whether the edge was added successful or not.
+    /// - Returns: A Bool value indicating whether the edge was added successfully or not.
     private func addEdge(from str: String,
                          withIndexMap indexMap: inout [String: Int]) -> Bool {
         /**
@@ -244,7 +244,7 @@ public class SGraph: Sequence {
     
     /// Removes the vertex from the graph.
     ///
-    /// - Complexity: O(numberOfNodes * numberOfEdges).
+    /// - Complexity: O(numberOfNodes + numberOfEdges).
     /// - Parameter v: The index of the vertex to be removed
     public func removeVertex(_ v: Int) {
         
@@ -258,7 +258,7 @@ public class SGraph: Sequence {
          *  Since removing a vertex decreases all the indices of the vertices
          *  with a larger index, we have to rename all these vertices, which
          *  can be neighbors of any vertex. This means, we have to iterate all
-         *  vertices and check whether they have an index with a larger vertex.
+         *  vertices and check whether they have an neighbor with a larger index.
          *  Since we have to do this anyway, we can remove references to the
          *  deleted vertex in the meantime.
          */
@@ -387,7 +387,7 @@ public class SGraph: Sequence {
     
     /// Determines whether to vertices are connected by an edge, or not.
     ///
-    /// - Complexity: If the graph is directed: O(deg(u)). If the graph is undirected: O(max(deg(u), deg(v)).
+    /// - Complexity: If the graph is directed: O(deg(u)). If the graph is undirected: O(min(deg(u), deg(v)).
     /// - Parameters:
     ///   - u: The index of the first vertex.
     ///   - v: The index of the second vertex.
@@ -487,9 +487,7 @@ public class SGraph: Sequence {
             }
         }
         
-        exponent = 1.0 + Double(nodesWithDegreeAtLeastThreshold) / exponent;
-        
-        return exponent
+        return 1.0 + Double(nodesWithDegreeAtLeastThreshold) / exponent;
     }
     
     
@@ -597,6 +595,17 @@ public class SGraph: Sequence {
                               directed: self.directed)
         
         /**
+         *  Prepare an indicator array that denotes which vertices are part of
+         *  the subgraph, as that will save time later.
+         */
+        var isInComponent = [Bool](repeating: false,
+                                   count: self.numberOfVertices)
+        
+        for vertex in vertices {
+            isInComponent[vertex] = true
+        }
+        
+        /**
          *  The vertices in the new graph are indexed from 0 to |vertices| - 1.
          *  Therefore, we create a map that can later be used to identify the
          *  vertices in the subgraph.
@@ -622,7 +631,7 @@ public class SGraph: Sequence {
                 /**
                  *  Check whether this neighbor is also in the subgraph
                  */
-                if vertices.contains(neighborInOriginalGraph) {
+                if isInComponent[neighborInOriginalGraph] {
                     /**
                      *  If the force unwrapping fails here, the vertex map is corrupted
                      *  which cannot happen.
@@ -733,6 +742,7 @@ public class SGraph: Sequence {
                 /**
                  *  Get the vertices of the component that contains the start vertex v.
                  */
+                // TODO: We can actually save the for-loop after this statement, by using the BFS directly, instead of relying on verticesInConnectedComponent!:
                 let verticesInCurrentComponent = self.verticesInConnectedComponent(containing: v)
                 
                 /**
@@ -787,7 +797,7 @@ public class SGraph: Sequence {
     /// Determines the vertex sets that represent the connected components of
     /// the graph.
     ///
-    /// - Complexity: O(numberOfVertices + numberOfEdges). Additionally for each component Set subtractions have to be performed.
+    /// - Complexity: O(numberOfVertices + numberOfEdges).
     /// - Returns: An array containing arrays, each representing the connected components of the receiver, sorted by the size of the components in descending order.
     public func verticesInConnectedComponents() -> [[Int]] {
         
@@ -849,7 +859,7 @@ public class SGraph: Sequence {
     
     /// Determines all connected components of the receiver.
     ///
-    /// - Complexity: Complexits of 'verticesInConnectedComponents' + Complexity of 'subgraph'. (The latter is amortized in O(|vertices| * max_degree))
+    /// - Complexity: Complexits of 'verticesInConnectedComponents' + Complexity of 'subgraph'. (The latter is amortized in O(numberOfVertices * max_degree))
     /// - Returns: An array of tuples, each containing a subgraph representing a connected component of the receiver as well as a dictionary that maps the vertices in the receiver to their counterparts in the induced subgraph. (sorted by component size).
     public func connectedComponents() -> [(SGraph, [Int: Int])] {
         
@@ -1034,7 +1044,7 @@ public class SGraph: Sequence {
     /// If the inverted flag is set, each line has the form: label\tindex
     ///
     /// - Parameter inverted: If inverted the map from the labels to the indices will be printed instead. (Default is false.)
-    /// - Complexity: O(|vertices|)
+    /// - Complexity: O(numberOfVertices)
     /// - Returns: A string representing the index -> label map.
     public func vertexLabelsToString(inverted: Bool = false) -> String {
         var vertexLabelString = ""
